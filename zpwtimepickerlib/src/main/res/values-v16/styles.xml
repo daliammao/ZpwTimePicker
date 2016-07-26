@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="SPDateLabelTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textSize">@dimen/sp_date_picker_date_label_size</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="SPDateRangeLabelTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textSize">@dimen/sp_date_picker_date_range_label_size</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <style name="SPYearLabelTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textSize">@dimen/sp_datepicker_list_year_label_size</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
+    <style name="SPYearLabelActivatedTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">?attr/colorControlActivated</item>
+        <item name="android:textSize">@dimen/sp_datepicker_list_year_activated_label_size</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+</resources>
