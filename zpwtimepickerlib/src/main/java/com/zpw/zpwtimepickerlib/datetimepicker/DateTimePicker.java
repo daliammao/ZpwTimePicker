@@ -41,7 +41,7 @@ import com.zpw.zpwtimepickerlib.datepicker.DatePicker;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
 import com.zpw.zpwtimepickerlib.drawables.OverflowDrawable;
 import com.zpw.zpwtimepickerlib.helpers.Options;
-import com.zpw.zpwtimepickerlib.helpers.SublimeListenerAdapter;
+import com.zpw.zpwtimepickerlib.helpers.ListenerAdapter;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 import com.zpw.zpwtimepickerlib.timepicker.TimePicker;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
@@ -90,7 +90,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     private TimePicker mTimePicker;
 
     // Callback
-    private SublimeListenerAdapter mListener;
+    private ListenerAdapter mListener;
 
     // Client-set options
     private Options mOptions;
@@ -131,7 +131,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     private final ButtonHandler.Callback mButtonLayoutCallback = new ButtonHandler.Callback() {
         @Override
         public void onOkay() {
-            SelectedDate selectedDate = null;
+            SelectedDateTime selectedDate = null;
 
             if (mDatePickerEnabled) {
                 selectedDate = mDatePicker.getSelectedDate();
@@ -231,7 +231,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
                 findViewById(R.id.repeat_option_picker);
     }
 
-    public void initializePicker(Options options, SublimeListenerAdapter listener) {
+    public void initializePicker(Options options, ListenerAdapter listener) {
         if (listener == null) {
             throw new IllegalArgumentException("Listener cannot be null.");
         }

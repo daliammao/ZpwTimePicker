@@ -340,6 +340,7 @@ public class Options implements Parcelable {
 
     public int[] getTimeParams() {
         if (mStartHour == -1 || mStartMinute == -1) {
+            DateTime dateTime = DateTime.now();
             LocalTime time = LocalTime.now();
             mStartHour = time.getHourOfDay();
             mStartMinute = time.getMinuteOfHour();

@@ -18,16 +18,15 @@ package com.zpw.zpwtimepickerlib.helpers;
 
 import com.zpw.zpwtimepickerlib.datetimepicker.DateTimePicker;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
+import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 
 import java.util.Date;
 
-public abstract class SublimeListenerAdapter {
+public abstract class ListenerAdapter {
     /**
      * @param sublimeMaterialPicker SublimeMaterialPicker view
-     * @param selectedDate          The date that was set.
-     * @param hourOfDay             The hour of day that was set.
-     * @param minute                The minute that was set.
+     * @param selectedDateTime      The datetime that was set.
      * @param recurrenceOption      One of the options defined in
      *                              SublimeRecurrencePicker.RecurrenceOption.
      *                              'recurrenceRule' will only be passed if
@@ -37,8 +36,7 @@ public abstract class SublimeListenerAdapter {
      *                              other than 'CUSTOM'.
      */
     public abstract void onDateTimeRecurrenceSet(DateTimePicker sublimeMaterialPicker,
-                                                 SelectedDate selectedDate,
-                                                 int hourOfDay, int minute,
+                                                 SelectedDateTime selectedDateTime,
                                                  RecurrencePicker.RecurrenceOption recurrenceOption,
                                                  String recurrenceRule);
 

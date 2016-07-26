@@ -23,31 +23,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
 import com.zpw.zpwtimepickerlib.datetimepicker.DateTimePicker;
-import com.zpw.zpwtimepickerlib.helpers.SublimeListenerAdapter;
+import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
+import com.zpw.zpwtimepickerlib.helpers.ListenerAdapter;
 import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 
-import java.text.DateFormat;
-import java.util.Locale;
-import java.util.TimeZone;
-
 public class PickerDialog extends DialogFragment {
-    // Date & Time formatter used for formatting
-    // text on the switcher button
-    DateFormat mDateFormatter, mTimeFormatter;
 
     // Picker
-    DateTimePicker mSublimePicker;
+    DateTimePicker mDateTimePicker;
 
     // Callback to activity
     Callback mCallback;
 
-    SublimeListenerAdapter mListener = new SublimeListenerAdapter() {
+    ListenerAdapter mListener = new ListenerAdapter() {
         @Override
         public void onCancelled() {
-            if (mCallback!= null) {
+            if (mCallback != null) {
                 mCallback.onCancelled();
             }
 
@@ -57,13 +50,11 @@ public class PickerDialog extends DialogFragment {
 
         @Override
         public void onDateTimeRecurrenceSet(DateTimePicker sublimeMaterialPicker,
-                                            SelectedDate selectedDate,
-                                            int hourOfDay, int minute,
+                                            SelectedDateTime selectedDateTime,
                                             RecurrencePicker.RecurrenceOption recurrenceOption,
                                             String recurrenceRule) {
             if (mCallback != null) {
-                mCallback.onDateTimeRecurrenceSet(selectedDate,
-                        hourOfDay, minute, recurrenceOption, recurrenceRule);
+                mCallback.onDateTimeRecurrenceSet(selectedDateTime, recurrenceOption, recurrenceRule);
             }
 
             // Should actually be called by activity inside `Callback.onCancelled()`
@@ -72,13 +63,6 @@ public class PickerDialog extends DialogFragment {
 // You can also override 'formatDate(Date)' & 'formatTime(Date)'
         // to supply custom formatters.
     };
-
-    public PickerDialog() {
-        // Initialize formatters
-        mDateFormatter = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        mTimeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT, Locale.getDefault());
-        mTimeFormatter.setTimeZone(TimeZone.getTimeZone("GMT+0"));
-    }
 
     // Set activity callback
     public void setCallback(Callback callback) {
@@ -98,7 +82,7 @@ public class PickerDialog extends DialogFragment {
             throw new RuntimeException();
         }*/
 
-        mSublimePicker = (DateTimePicker) getActivity()
+        mDateTimePicker = (DateTimePicker) getActivity()
                 .getLayoutInflater().inflate(R.layout.sublime_picker, container);
 
         // Retrieve Options
@@ -111,16 +95,15 @@ public class PickerDialog extends DialogFragment {
             options = arguments.getParcelable("SUBLIME_OPTIONS");
         }
 
-        mSublimePicker.initializePicker(options, mListener);
-        return mSublimePicker;
+        mDateTimePicker.initializePicker(options, mListener);
+        return mDateTimePicker;
     }
 
     // For communicating with the activity
     public interface Callback {
         void onCancelled();
 
-        void onDateTimeRecurrenceSet(SelectedDate selectedDate,
-                                     int hourOfDay, int minute,
+        void onDateTimeRecurrenceSet(SelectedDateTime selectedDateTime,
                                      RecurrencePicker.RecurrenceOption recurrenceOption,
                                      String recurrenceRule);
     }
