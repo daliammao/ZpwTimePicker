@@ -154,7 +154,7 @@
         android:layout_marginTop="@dimen/sp_button_bar_padding_top"
         android:layout_marginBottom="@dimen/sp_button_bar_padding_bottom" />
 
-    <com.appeaser.sublimepickerlibrary.timepicker.RadialTimePickerView
+    <com.zpw.zpwtimepickerlib.timepicker.RadialTimePickerView
         android:id="@+id/radial_picker"
         android:layout_width="@dimen/sp_timepicker_radial_picker_dimen"
         android:layout_height="@dimen/sp_timepicker_radial_picker_dimen"

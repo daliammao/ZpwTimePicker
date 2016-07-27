@@ -38,12 +38,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zpw.zpwtimepickerlib.PickerDialog;
-import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
+import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
 import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+
 import java.text.DateFormat;
-import java.util.Calendar;
 
 public class Sampler extends AppCompatActivity {
 
@@ -69,7 +71,7 @@ public class Sampler extends AppCompatActivity {
     LinearLayout llDateHolder, llDateRangeHolder;
 
     // Chosen values
-    SelectedDate mSelectedDate;
+    SelectedDateTime mSelectedDateTime;
     int mHour, mMinute;
     String mRecurrenceOption, mRecurrenceRule;
 
@@ -80,14 +82,11 @@ public class Sampler extends AppCompatActivity {
         }
 
         @Override
-        public void onDateTimeRecurrenceSet(SelectedDate selectedDate,
-                                            int hourOfDay, int minute,
+        public void onDateTimeRecurrenceSet(SelectedDateTime selectedDateTime,
                                             RecurrencePicker.RecurrenceOption recurrenceOption,
                                             String recurrenceRule) {
 
-            mSelectedDate = selectedDate;
-            mHour = hourOfDay;
-            mMinute = minute;
+            mSelectedDateTime = selectedDateTime;
             mRecurrenceOption = recurrenceOption != null ?
                     recurrenceOption.name() : "n/a";
             mRecurrenceRule = recurrenceRule != null ?
@@ -256,15 +255,13 @@ public class Sampler extends AppCompatActivity {
                 int startYear = savedInstanceState.getInt(SS_START_YEAR);
 
                 if (startYear != INVALID_VAL) {
-                    Calendar startCal = Calendar.getInstance();
-                    startCal.set(startYear, savedInstanceState.getInt(SS_START_MONTH),
+                    LocalDate startCal = new LocalDate(startYear, savedInstanceState.getInt(SS_START_MONTH),
                             savedInstanceState.getInt(SS_START_DAY));
 
-                    Calendar endCal = Calendar.getInstance();
-                    endCal.set(savedInstanceState.getInt(SS_END_YEAR),
+                    LocalDate endCal = new LocalDate(savedInstanceState.getInt(SS_END_YEAR),
                             savedInstanceState.getInt(SS_END_MONTH),
                             savedInstanceState.getInt(SS_END_DAY));
-                    mSelectedDate = new SelectedDate(startCal, endCal);
+                    mSelectedDateTime = new SelectedDateTime(startCal.toDateTime(LocalTime.now()), endCal.toDateTime(LocalTime.now()));
                 }
 
                 mHour = savedInstanceState.getInt(SS_HOUR);
@@ -383,25 +380,25 @@ public class Sampler extends AppCompatActivity {
 
     // Show date, time & recurrence options that have been selected
     private void updateInfoView() {
-        if (mSelectedDate != null) {
-            if (mSelectedDate.getType() == SelectedDate.Type.SINGLE) {
+        if (mSelectedDateTime != null) {
+            if (mSelectedDateTime.getType() == SelectedDateTime.Type.SINGLE) {
                 llDateRangeHolder.setVisibility(View.GONE);
                 llDateHolder.setVisibility(View.VISIBLE);
 
                 tvYear.setText(applyBoldStyle("YEAR: ")
-                        .append(String.valueOf(mSelectedDate.getStartDate().get(Calendar.YEAR))));
+                        .append(String.valueOf(mSelectedDateTime.getStartDate().getYear())));
                 tvMonth.setText(applyBoldStyle("MONTH: ")
-                        .append(String.valueOf(mSelectedDate.getStartDate().get(Calendar.MONTH))));
+                        .append(String.valueOf(mSelectedDateTime.getStartDate().getMonthOfYear())));
                 tvDay.setText(applyBoldStyle("DAY: ")
-                        .append(String.valueOf(mSelectedDate.getStartDate().get(Calendar.DAY_OF_MONTH))));
-            } else if (mSelectedDate.getType() == SelectedDate.Type.RANGE) {
+                        .append(String.valueOf(mSelectedDateTime.getStartDate().getDayOfMonth())));
+            } else if (mSelectedDateTime.getType() == SelectedDateTime.Type.RANGE) {
                 llDateHolder.setVisibility(View.GONE);
                 llDateRangeHolder.setVisibility(View.VISIBLE);
 
                 tvStartDate.setText(applyBoldStyle("START: ")
-                        .append(DateFormat.getDateInstance().format(mSelectedDate.getStartDate().getTime())));
+                        .append(DateFormat.getDateInstance().format(mSelectedDateTime.getStartDate().toDate().getTime())));
                 tvEndDate.setText(applyBoldStyle("END: ")
-                        .append(DateFormat.getDateInstance().format(mSelectedDate.getEndDate().getTime())));
+                        .append(DateFormat.getDateInstance().format(mSelectedDateTime.getEndDate().toDate().getTime())));
             }
         }
 
@@ -451,13 +448,13 @@ public class Sampler extends AppCompatActivity {
         outState.putBoolean(SS_RECURRENCE_PICKER_CHECKED, cbRecurrencePicker.isChecked());
         outState.putBoolean(SS_ALLOW_DATE_RANGE_SELECTION, cbAllowDateRangeSelection.isChecked());
 
-        int startYear = mSelectedDate != null ? mSelectedDate.getStartDate().get(Calendar.YEAR) : INVALID_VAL;
-        int startMonth = mSelectedDate != null ? mSelectedDate.getStartDate().get(Calendar.MONTH) : INVALID_VAL;
-        int startDayOfMonth = mSelectedDate != null ? mSelectedDate.getStartDate().get(Calendar.DAY_OF_MONTH) : INVALID_VAL;
+        int startYear = mSelectedDateTime != null ? mSelectedDateTime.getStartDate().getYear(): INVALID_VAL;
+        int startMonth = mSelectedDateTime != null ? mSelectedDateTime.getStartDate().getMonthOfYear() : INVALID_VAL;
+        int startDayOfMonth = mSelectedDateTime != null ? mSelectedDateTime.getStartDate().getDayOfMonth() : INVALID_VAL;
 
-        int endYear = mSelectedDate != null ? mSelectedDate.getEndDate().get(Calendar.YEAR) : INVALID_VAL;
-        int endMonth = mSelectedDate != null ? mSelectedDate.getEndDate().get(Calendar.MONTH) : INVALID_VAL;
-        int endDayOfMonth = mSelectedDate != null ? mSelectedDate.getEndDate().get(Calendar.DAY_OF_MONTH) : INVALID_VAL;
+        int endYear = mSelectedDateTime != null ? mSelectedDateTime.getEndDate().getYear() : INVALID_VAL;
+        int endMonth = mSelectedDateTime != null ? mSelectedDateTime.getEndDate().getMonthOfYear() : INVALID_VAL;
+        int endDayOfMonth = mSelectedDateTime != null ? mSelectedDateTime.getEndDate().getDayOfMonth() : INVALID_VAL;
 
         // Save data
         outState.putInt(SS_START_YEAR, startYear);

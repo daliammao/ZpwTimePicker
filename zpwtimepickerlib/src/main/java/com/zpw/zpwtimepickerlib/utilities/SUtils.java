@@ -33,14 +33,19 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewCompat;
-import android.util.Config;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
+
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -127,7 +132,7 @@ public class SUtils {
         CORNER_RADIUS = context.getResources()
                 .getDimensionPixelSize(R.dimen.control_corner_material);
 
-        if (Config.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.i(TAG, "COLOR_ACCENT: " + Integer.toHexString(COLOR_ACCENT));
             Log.i(TAG, "COLOR_CONTROL_HIGHLIGHT: " + Integer.toHexString(COLOR_CONTROL_HIGHLIGHT));
             Log.i(TAG, "COLOR_CONTROL_ACTIVATED: " + Integer.toHexString(COLOR_CONTROL_ACTIVATED));
@@ -340,14 +345,11 @@ public class SUtils {
      * @param oldCalendar The old calendar.
      * @param locale      The locale.
      */
-    public static Calendar getCalendarForLocale(Calendar oldCalendar, Locale locale) {
+    public static LocalDate getCalendarForLocale(LocalDate oldCalendar, Locale locale) {
         if (oldCalendar == null) {
-            return Calendar.getInstance(locale);
+            return LocalDate.now();
         } else {
-            final long currentTimeMillis = oldCalendar.getTimeInMillis();
-            Calendar newCalendar = Calendar.getInstance(locale);
-            newCalendar.setTimeInMillis(currentTimeMillis);
-            return newCalendar;
+            return new LocalDate(oldCalendar);
         }
     }
 
@@ -421,18 +423,18 @@ public class SUtils {
     /**
      * Date format for parsing dates.
      */
-    private static final DateFormat DATE_FORMATTER = new SimpleDateFormat(DATE_FORMAT);
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_FORMAT);
 
-    public static boolean parseDate(String date, Calendar outDate) {
+    public static boolean parseDate(String date, LocalDate outDate) {
         if (date == null || date.isEmpty()) {
             return false;
         }
 
         try {
-            final Date parsedDate = DATE_FORMATTER.parse(date);
-            outDate.setTime(parsedDate);
+            final LocalDate parsedDate = LocalDate.parse(date,DATE_FORMATTER);
+            outDate.withFields(parsedDate);
             return true;
-        } catch (ParseException e) {
+        } catch (Exception e) {
             Log.w(TAG, "Date: " + date + " not in format: " + DATE_FORMAT);
             return false;
         }

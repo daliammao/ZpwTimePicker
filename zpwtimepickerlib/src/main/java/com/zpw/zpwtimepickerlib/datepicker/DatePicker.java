@@ -48,13 +48,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.ViewAnimator;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
 import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 import com.zpw.zpwtimepickerlib.utilities.TextColorHelper;
 
-import java.text.SimpleDateFormat;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -74,8 +79,8 @@ public class DatePicker extends FrameLayout {
 
     private Context mContext;
 
-    private SimpleDateFormat mYearFormat;
-    private SimpleDateFormat mMonthDayFormat;
+    private DateTimeFormatter mYearFormat;
+    private DateTimeFormatter mMonthDayFormat;
 
     // Top-level container.
     private ViewGroup mContainer;
@@ -103,9 +108,9 @@ public class DatePicker extends FrameLayout {
     private int mCurrentView = UNINITIALIZED;
 
     private SelectedDate mCurrentDate;
-    private Calendar mTempDate;
-    private Calendar mMinDate;
-    private Calendar mMaxDate;
+    private LocalDate mTempDate;
+    private LocalDate mMinDate;
+    private LocalDate mMaxDate;
 
     private int mFirstDayOfWeek;
 
@@ -144,13 +149,10 @@ public class DatePicker extends FrameLayout {
                 == Configuration.ORIENTATION_LANDSCAPE;
 
         setCurrentLocale(Locale.getDefault());
-        mCurrentDate = new SelectedDate(Calendar.getInstance(mCurrentLocale));
-        mTempDate = Calendar.getInstance(mCurrentLocale);
-        mMinDate = Calendar.getInstance(mCurrentLocale);
-        mMaxDate = Calendar.getInstance(mCurrentLocale);
-
-        mMinDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
-        mMaxDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
+        mCurrentDate = new SelectedDate(LocalDate.now());
+        mTempDate = LocalDate.now();
+        mMinDate = new LocalDate(DEFAULT_START_YEAR,Calendar.JANUARY+1,1);
+        mMaxDate = new LocalDate(DEFAULT_END_YEAR,Calendar.DECEMBER+1,31);
 
         final Resources res = getResources();
         final TypedArray a = mContext.obtainStyledAttributes(attrs,
@@ -224,35 +226,35 @@ public class DatePicker extends FrameLayout {
         }
 
         int firstDayOfWeek = a.getInt(R.styleable.SublimeDatePicker_spFirstDayOfWeek,
-                mCurrentDate.getFirstDate().getFirstDayOfWeek());
+                Calendar.getInstance(mCurrentLocale).getFirstDayOfWeek());
 
         final String minDate = a.getString(R.styleable.SublimeDatePicker_spMinDate);
         final String maxDate = a.getString(R.styleable.SublimeDatePicker_spMaxDate);
 
         // Set up min and max dates.
-        final Calendar tempDate = Calendar.getInstance();
+        LocalDate tempDate = LocalDate.now();
 
         if (!SUtils.parseDate(minDate, tempDate)) {
-            tempDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
+            tempDate = new LocalDate(DEFAULT_START_YEAR, Calendar.JANUARY + 1, 1);
         }
 
-        final long minDateMillis = tempDate.getTimeInMillis();
+        final LocalDate minLocalDate = tempDate;
 
         if (!SUtils.parseDate(maxDate, tempDate)) {
-            tempDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
+            tempDate = new LocalDate(DEFAULT_END_YEAR, Calendar.DECEMBER + 1, 31);
         }
 
-        final long maxDateMillis = tempDate.getTimeInMillis();
+        final LocalDate maxLocalDate = tempDate;
 
-        if (maxDateMillis < minDateMillis) {
+        if (maxLocalDate.isBefore(minLocalDate)) {
             throw new IllegalArgumentException("maxDate must be >= minDate");
         }
 
         final long setDateMillis = SUtils.constrain(
-                System.currentTimeMillis(), minDateMillis, maxDateMillis);
+                System.currentTimeMillis(), minLocalDate.toDate().getTime(), maxLocalDate.toDate().getTime());
 
-        mMinDate.setTimeInMillis(minDateMillis);
-        mMaxDate.setTimeInMillis(maxDateMillis);
+        mMinDate = minLocalDate;
+        mMaxDate = maxLocalDate;
         mCurrentDate.setTimeInMillis(setDateMillis);
 
         a.recycle();
@@ -263,8 +265,8 @@ public class DatePicker extends FrameLayout {
         // Set up day picker view.
         mDayPickerView = (DayPickerView) mAnimator.findViewById(R.id.date_picker_day_picker);
         setFirstDayOfWeek(firstDayOfWeek);
-        mDayPickerView.setMinDate(mMinDate.getTimeInMillis());
-        mDayPickerView.setMaxDate(mMaxDate.getTimeInMillis());
+        mDayPickerView.setMinDate(mMinDate);
+        mDayPickerView.setMaxDate(mMaxDate);
         mDayPickerView.setDate(mCurrentDate);
         mDayPickerView.setProxyDaySelectionEventListener(mProxyDaySelectionEventListener);
 
@@ -290,8 +292,8 @@ public class DatePicker extends FrameLayout {
     private final DayPickerView.ProxyDaySelectionEventListener mProxyDaySelectionEventListener
             = new DayPickerView.ProxyDaySelectionEventListener() {
         @Override
-        public void onDaySelected(DayPickerView view, Calendar day) {
-            if (Config.DEBUG) {
+        public void onDaySelected(DayPickerView view, LocalDate day) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "tvHeaderDateStart is activated? " + tvHeaderDateStart.isActivated());
                 Log.i(TAG, "tvHeaderDateEnd is activated? " + tvHeaderDateEnd.isActivated());
             }
@@ -315,7 +317,7 @@ public class DatePicker extends FrameLayout {
                         mCurrentDate = new SelectedDate(mCurrentDate.getStartDate(), day);
                     }
                 } else { // Should never happen
-                    if (Config.DEBUG) {
+                    if (BuildConfig.DEBUG) {
                         Log.i(TAG, "onDaySelected: Neither tvDateStart, nor tvDateEnd is activated");
                     }
                 }
@@ -363,8 +365,8 @@ public class DatePicker extends FrameLayout {
             // to the last day of the selected month or year.
             // e.g. Switching from Mar to Apr when Mar 31 is selected -> Apr 30
             // e.g. Switching from 2012 to 2013 when Feb 29, 2012 is selected -> Feb 28, 2013
-            final int day = mCurrentDate.getStartDate().get(Calendar.DAY_OF_MONTH);
-            final int month = mCurrentDate.getStartDate().get(Calendar.MONTH);
+            final int day = mCurrentDate.getStartDate().getDayOfMonth();
+            final int month = mCurrentDate.getStartDate().getMonthOfYear();
             final int daysInMonth = SUtils.getDaysInMonth(month, year);
             if (day > daysInMonth) {
                 mCurrentDate.set(Calendar.DAY_OF_MONTH, daysInMonth);
@@ -422,8 +424,8 @@ public class DatePicker extends FrameLayout {
             datePattern = DateTimePatternHelper.getBestDateTimePattern(locale, DateTimePatternHelper.PATTERN_EMMMd);
         }
 
-        mMonthDayFormat = new SimpleDateFormat(datePattern, locale);
-        mYearFormat = new SimpleDateFormat("y", locale);
+        mMonthDayFormat = DateTimeFormat.forPattern(datePattern);
+        mYearFormat = DateTimeFormat.forPattern("y");
 
         // Update the header text.
         onCurrentDateChanged(false);
@@ -436,18 +438,18 @@ public class DatePicker extends FrameLayout {
             return;
         }
 
-        final String year = mYearFormat.format(mCurrentDate.getStartDate().getTime());
+        final String year =mCurrentDate.getStartDate().toString(mYearFormat);
         mHeaderYear.setText(year);
 
-        final String monthDay = mMonthDayFormat.format(mCurrentDate.getStartDate().getTime());
+        final String monthDay = mCurrentDate.getStartDate().toString(mMonthDayFormat);
         mHeaderMonthDay.setText(monthDay);
 
-        final String yearStrStart = mYearFormat.format(mCurrentDate.getStartDate().getTime());
-        final String monthDayStrStart = mMonthDayFormat.format(mCurrentDate.getStartDate().getTime());
+        final String yearStrStart = mCurrentDate.getStartDate().toString(mYearFormat);
+        final String monthDayStrStart = mCurrentDate.getStartDate().toString(mMonthDayFormat);
         final String dateStrStart = yearStrStart + "\n" + monthDayStrStart;
 
-        final String yearStrEnd = mYearFormat.format(mCurrentDate.getEndDate().getTime());
-        final String monthDayStrEnd = mMonthDayFormat.format(mCurrentDate.getEndDate().getTime());
+        final String yearStrEnd = mCurrentDate.getEndDate().toString(mYearFormat);
+        final String monthDayStrEnd = mCurrentDate.getEndDate().toString(mMonthDayFormat);
         final String dateStrEnd = yearStrEnd + "\n" + monthDayStrEnd;
 
         SpannableString spDateStart = new SpannableString(dateStrStart);
@@ -471,7 +473,7 @@ public class DatePicker extends FrameLayout {
 
         // TODO: This should use live regions.
         if (announce) {
-            final long millis = mCurrentDate.getStartDate().getTimeInMillis();
+            final long millis = mCurrentDate.getStartDate().toDate().getTime();
             final int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
             final String fullDateText = DateUtils.formatDateTime(mContext, millis, flags);
             AccessibilityUtils.makeAnnouncement(mAnimator, fullDateText);
@@ -553,7 +555,7 @@ public class DatePicker extends FrameLayout {
     // callbackToClient is useless for now & gives us an unnecessary round-trip
     // by calling init(...)
     private void onDateChanged(boolean fromUser, boolean callbackToClient, boolean goToPosition) {
-        final int year = mCurrentDate.getStartDate().get(Calendar.YEAR);
+        final int year = mCurrentDate.getStartDate().getYear();
 
         if (callbackToClient && mDateChangedListener != null) {
             mDateChangedListener.onDateChanged(this, mCurrentDate);
@@ -575,11 +577,11 @@ public class DatePicker extends FrameLayout {
     }
 
     private void updateHeaderViews() {
-        if (Config.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.i(TAG, "updateHeaderViews(): First Date: "
-                    + mCurrentDate.getFirstDate().getTimeInMillis()
+                    + mCurrentDate.getFirstDate().toString()
                     + " Second Date: "
-                    + mCurrentDate.getSecondDate().getTimeInMillis());
+                    + mCurrentDate.getSecondDate().toString());
         }
 
         if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
@@ -618,7 +620,7 @@ public class DatePicker extends FrameLayout {
     }
 
     public long getSelectedDateInMillis() {
-        return mCurrentDate.getStartDate().getTimeInMillis();
+        return mCurrentDate.getStartDate().toDate().getTime();
     }
 
     /**
@@ -629,17 +631,17 @@ public class DatePicker extends FrameLayout {
      * @param minDate The minimal supported date.
      */
     public void setMinDate(long minDate) {
-        mTempDate.setTimeInMillis(minDate);
-        if (mTempDate.get(Calendar.YEAR) == mMinDate.get(Calendar.YEAR)
-                && mTempDate.get(Calendar.DAY_OF_YEAR) != mMinDate.get(Calendar.DAY_OF_YEAR)) {
+        mTempDate.withFields(new DateTime(minDate).toLocalDate());
+        if (mTempDate.getYear() == mMinDate.getYear()
+                && mTempDate.getDayOfYear() != mMinDate.getDayOfYear()) {
             return;
         }
-        if (mCurrentDate.getStartDate().before(mTempDate)) {
-            mCurrentDate.getStartDate().setTimeInMillis(minDate);
+        if (mCurrentDate.getStartDate().isBefore(mTempDate)) {
+            mCurrentDate.getStartDate().withFields(mTempDate);
             onDateChanged(false, true, true);
         }
-        mMinDate.setTimeInMillis(minDate);
-        mDayPickerView.setMinDate(minDate);
+        mMinDate.withFields(mTempDate);
+        mDayPickerView.setMinDate(mMinDate);
         mYearPickerView.setRange(mMinDate, mMaxDate);
     }
 
@@ -652,7 +654,7 @@ public class DatePicker extends FrameLayout {
      * @return The minimal supported date.
      */
     @SuppressWarnings("unused")
-    public Calendar getMinDate() {
+    public LocalDate getMinDate() {
         return mMinDate;
     }
 
@@ -664,17 +666,17 @@ public class DatePicker extends FrameLayout {
      * @param maxDate The maximal supported date.
      */
     public void setMaxDate(long maxDate) {
-        mTempDate.setTimeInMillis(maxDate);
-        if (mTempDate.get(Calendar.YEAR) == mMaxDate.get(Calendar.YEAR)
-                && mTempDate.get(Calendar.DAY_OF_YEAR) != mMaxDate.get(Calendar.DAY_OF_YEAR)) {
+        mTempDate.withFields(new DateTime(maxDate).toLocalDate());
+        if (mTempDate.getYear() == mMaxDate.getYear()
+                && mTempDate.getDayOfYear()!= mMaxDate.getDayOfWeek()) {
             return;
         }
-        if (mCurrentDate.getEndDate().after(mTempDate)) {
-            mCurrentDate.getEndDate().setTimeInMillis(maxDate);
+        if (mCurrentDate.getEndDate().isAfter(mTempDate)) {
+            mCurrentDate.getEndDate().withFields(mTempDate);
             onDateChanged(false, true, true);
         }
-        mMaxDate.setTimeInMillis(maxDate);
-        mDayPickerView.setMaxDate(maxDate);
+        mMaxDate.withFields(mTempDate);
+        mDayPickerView.setMaxDate(mMaxDate);
         mYearPickerView.setRange(mMinDate, mMaxDate);
     }
 
@@ -687,18 +689,18 @@ public class DatePicker extends FrameLayout {
      * @return The maximal supported date.
      */
     @SuppressWarnings("unused")
-    public Calendar getMaxDate() {
+    public LocalDate getMaxDate() {
         return mMaxDate;
     }
 
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         if (firstDayOfWeek < Calendar.SUNDAY || firstDayOfWeek > Calendar.SATURDAY) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.e(TAG, "Provided `firstDayOfWeek` is invalid - it must be between 1 and 7. " +
                         "Given value: " + firstDayOfWeek + " Picker will use the default value for the given locale.");
             }
 
-            firstDayOfWeek = mCurrentDate.getFirstDate().getFirstDayOfWeek();
+            firstDayOfWeek = Calendar.getInstance(mCurrentLocale).getFirstDayOfWeek();
         }
 
         mFirstDayOfWeek = firstDayOfWeek;
@@ -753,8 +755,8 @@ public class DatePicker extends FrameLayout {
             listPositionOffset = mYearPickerView.getFirstPositionOffset();
         }
 
-        return new SavedState(superState, mCurrentDate, mMinDate.getTimeInMillis(),
-                mMaxDate.getTimeInMillis(), mCurrentView, listPosition,
+        return new SavedState(superState, mCurrentDate, mMinDate.toDate().getTime(),
+                mMaxDate.toDate().getTime(), mCurrentView, listPosition,
                 listPositionOffset, mCurrentlyActivatedRangeItem);
     }
 
@@ -765,18 +767,15 @@ public class DatePicker extends FrameLayout {
         super.onRestoreInstanceState(bss.getSuperState());
         SavedState ss = (SavedState) bss;
 
-        Calendar startDate = Calendar.getInstance(mCurrentLocale);
-        Calendar endDate = Calendar.getInstance(mCurrentLocale);
-
-        startDate.set(ss.getSelectedYearStart(), ss.getSelectedMonthStart(), ss.getSelectedDayStart());
-        endDate.set(ss.getSelectedYearEnd(), ss.getSelectedMonthEnd(), ss.getSelectedDayEnd());
+        LocalDate startDate = new LocalDate(ss.getSelectedYearStart(), ss.getSelectedMonthStart(), ss.getSelectedDayStart());
+        LocalDate endDate = new LocalDate(ss.getSelectedYearEnd(), ss.getSelectedMonthEnd(), ss.getSelectedDayEnd());
 
         mCurrentDate.setFirstDate(startDate);
         mCurrentDate.setSecondDate(endDate);
 
         int currentView = ss.getCurrentView();
-        mMinDate.setTimeInMillis(ss.getMinDate());
-        mMaxDate.setTimeInMillis(ss.getMaxDate());
+        mMinDate.withFields(new DateTime(ss.getMinDate()).toLocalDate());
+        mMaxDate.withFields(new DateTime(ss.getMaxDate()).toLocalDate());
 
         mCurrentlyActivatedRangeItem = ss.getCurrentlyActivatedRangeItem();
 
@@ -804,7 +803,7 @@ public class DatePicker extends FrameLayout {
     @Override
     public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
         super.onPopulateAccessibilityEvent(event);
-        event.getText().add(mCurrentDate.getStartDate().getTime().toString());
+        event.getText().add(mCurrentDate.getStartDate().toString());
     }
 
     public CharSequence getAccessibilityClassName() {
@@ -855,12 +854,12 @@ public class DatePicker extends FrameLayout {
                            long minDate, long maxDate, int currentView, int listPosition,
                            int listPositionOffset, int currentlyActivatedRangeItem) {
             super(superState);
-            mSelectedYearStart = selectedDate.getStartDate().get(Calendar.YEAR);
-            mSelectedMonthStart = selectedDate.getStartDate().get(Calendar.MONTH);
-            mSelectedDayStart = selectedDate.getStartDate().get(Calendar.DAY_OF_MONTH);
-            mSelectedYearEnd = selectedDate.getEndDate().get(Calendar.YEAR);
-            mSelectedMonthEnd = selectedDate.getEndDate().get(Calendar.MONTH);
-            mSelectedDayEnd = selectedDate.getEndDate().get(Calendar.DAY_OF_MONTH);
+            mSelectedYearStart = selectedDate.getStartDate().getYear();
+            mSelectedMonthStart = selectedDate.getStartDate().getMonthOfYear();
+            mSelectedDayStart = selectedDate.getStartDate().getDayOfMonth();
+            mSelectedYearEnd = selectedDate.getEndDate().getYear();
+            mSelectedMonthEnd = selectedDate.getEndDate().getMonthOfYear();
+            mSelectedDayEnd = selectedDate.getEndDate().getDayOfMonth();
             mMinDate = minDate;
             mMaxDate = maxDate;
             mCurrentView = currentView;

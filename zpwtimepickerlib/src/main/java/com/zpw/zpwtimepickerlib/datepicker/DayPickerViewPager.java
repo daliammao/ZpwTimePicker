@@ -23,7 +23,6 @@ import android.support.v4.BuildConfig;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.util.Config;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -226,7 +225,7 @@ class DayPickerViewPager extends ViewPager {
             postDelayed(mCheckForLongPress, ViewConfiguration.getLongPressTimeout());
         } else if (ev.getAction() == MotionEvent.ACTION_UP
                 || ev.getAction() == MotionEvent.ACTION_CANCEL) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "OITE: (UP || CANCEL)");
             }
 
@@ -243,7 +242,7 @@ class DayPickerViewPager extends ViewPager {
             }
 
             if (!isStillALongPress((int) ev.getX(), (int) ev.getY())) {
-                if (Config.DEBUG) {
+                if (BuildConfig.DEBUG) {
                     Log.i(TAG, "OITE: MOVED TOO MUCH, CANCELLING CheckForLongPress Runnable");
                 }
 
@@ -316,13 +315,13 @@ class DayPickerViewPager extends ViewPager {
             }
             //return true;
         } else if (mIsLongPressed && ev.getAction() == MotionEvent.ACTION_DOWN) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "OTE: LONGPRESS && DOWN");
             }
 
             mScrollingDirection = NOT_SCROLLING;
         } else if (mIsLongPressed && ev.getAction() == MotionEvent.ACTION_MOVE) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "OTE: LONGPRESS && MOVE");
             }
 

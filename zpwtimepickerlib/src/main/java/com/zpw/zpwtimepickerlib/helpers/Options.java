@@ -287,22 +287,22 @@ public class Options implements Parcelable {
     }
 
     public SelectedDate getDateParams() {
-        Calendar startCal = SUtils.getCalendarForLocale(null, Locale.getDefault());
+        LocalDate startCal = SUtils.getCalendarForLocale(null, Locale.getDefault());
         if (mStartYear == -1 || mStartMonth == -1 || mStartDayOfMonth == -1) {
-            mStartYear = startCal.get(Calendar.YEAR);
-            mStartMonth = startCal.get(Calendar.MONTH);
-            mStartDayOfMonth = startCal.get(Calendar.DAY_OF_MONTH);
+            mStartYear = startCal.getYear();
+            mStartMonth = startCal.getMonthOfYear();
+            mStartDayOfMonth = startCal.getDayOfMonth();
         } else {
-            startCal.set(mStartYear, mStartMonth, mStartDayOfMonth);
+            startCal = new LocalDate(mStartYear, mStartMonth, mStartDayOfMonth);
         }
 
-        Calendar endCal = SUtils.getCalendarForLocale(null, Locale.getDefault());
+        LocalDate endCal = SUtils.getCalendarForLocale(null, Locale.getDefault());
         if (mEndYear == -1 || mEndMonth == -1 || mEndDayOfMonth == -1) {
-            mEndYear = endCal.get(Calendar.YEAR);
-            mEndMonth = endCal.get(Calendar.MONTH);
-            mEndDayOfMonth = endCal.get(Calendar.DAY_OF_MONTH);
+            mEndYear = endCal.getYear();
+            mEndMonth = endCal.getMonthOfYear();
+            mEndDayOfMonth = endCal.getDayOfMonth();
         } else {
-            endCal.set(mEndYear, mEndMonth, mEndDayOfMonth);
+            endCal = new LocalDate(mEndYear, mEndMonth, mEndDayOfMonth);
         }
 
         return new SelectedDate(startCal, endCal);

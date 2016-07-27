@@ -1,7 +1,7 @@
 package com.zpw.zpwtimepickerlib.common;
 
 import android.support.annotation.NonNull;
-import android.util.Config;
+import android.support.v4.BuildConfig;
 import android.util.Log;
 
 import com.zpw.zpwtimepickerlib.datepicker.DatePicker;
@@ -73,7 +73,7 @@ public class DateTimePatternHelper {
             return patterns[patternIndex];
         }
 
-        if (Config.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Log.e(TAG, "Could not find date-time pattern for Locale: '"
                     + givenLocale.toString() + "', and map size is: " + sDateTimePatterns.size()
                     + ", and loaded map size is: " + sLoadedDateTimePatterns.size());

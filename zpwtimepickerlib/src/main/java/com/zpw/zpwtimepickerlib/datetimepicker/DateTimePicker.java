@@ -40,14 +40,17 @@ import com.zpw.zpwtimepickerlib.common.ButtonHandler;
 import com.zpw.zpwtimepickerlib.datepicker.DatePicker;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
 import com.zpw.zpwtimepickerlib.drawables.OverflowDrawable;
-import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.helpers.ListenerAdapter;
+import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 import com.zpw.zpwtimepickerlib.timepicker.TimePicker;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+import org.joda.time.Period;
+
 import java.text.DateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -131,17 +134,17 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     private final ButtonHandler.Callback mButtonLayoutCallback = new ButtonHandler.Callback() {
         @Override
         public void onOkay() {
-            SelectedDateTime selectedDate = null;
-
-            if (mDatePickerEnabled) {
-                selectedDate = mDatePicker.getSelectedDate();
-            }
+            SelectedDateTime selectedDateTime = null;
 
             int hour = -1, minute = -1;
 
             if (mTimePickerEnabled) {
                 hour = mTimePicker.getCurrentHour();
                 minute = mTimePicker.getCurrentMinute();
+            }
+
+            if (mDatePickerEnabled) {
+                selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(new LocalTime(hour,minute),LocalTime.now());
             }
 
             RecurrencePicker.RecurrenceOption recurrenceOption
@@ -158,9 +161,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
 
             mListener.onDateTimeRecurrenceSet(DateTimePicker.this,
                     // DatePicker
-                    selectedDate,
-                    // TimePicker
-                    hour, minute,
+                    selectedDateTime,
                     // RecurrencePicker
                     recurrenceOption, recurrenceRule);
         }
@@ -347,44 +348,26 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     }
 
     private String formatDateRange(SelectedDate selectedDate) {
-        Calendar startDate = selectedDate.getStartDate();
-        Calendar endDate = selectedDate.getEndDate();
+        LocalDate startDate = selectedDate.getStartDate();
+        LocalDate endDate = selectedDate.getEndDate();
 
-        startDate.set(Calendar.MILLISECOND, 0);
-        startDate.set(Calendar.SECOND, 0);
-        startDate.set(Calendar.MINUTE, 0);
-        startDate.set(Calendar.HOUR, 0);
-
-        endDate.set(Calendar.MILLISECOND, 0);
-        endDate.set(Calendar.SECOND, 0);
-        endDate.set(Calendar.MINUTE, 0);
-        endDate.set(Calendar.HOUR, 0);
         // Move to next day since we are nulling out the time fields
-        endDate.add(Calendar.DAY_OF_MONTH, 1);
+        endDate.plusDays(1);
 
-        float elapsedTime = endDate.getTimeInMillis() - startDate.getTimeInMillis();
+        Period period = new Period(startDate,endDate);
 
-        if (elapsedTime >= DateUtils.YEAR_IN_MILLIS) {
-            final float years = elapsedTime / DateUtils.YEAR_IN_MILLIS;
+        if (period.getYears()>0) {
+            final int years = period.getYears();
 
-            boolean roundUp = years - (int) years > 0.5f;
-            final int yearsVal = roundUp ? (int) (years + 1) : (int) years;
+            return "~" + years + " " + (years == 1 ? "year" : "years");
+        } else if (period.getMonths()>0) {
+            final float months = period.getMonths();
 
-            return "~" + yearsVal + " " + (yearsVal == 1 ? "year" : "years");
-        } else if (elapsedTime >= MONTH_IN_MILLIS) {
-            final float months = elapsedTime / MONTH_IN_MILLIS;
-
-            boolean roundUp = months - (int) months > 0.5f;
-            final int monthsVal = roundUp ? (int) (months + 1) : (int) months;
-
-            return "~" + monthsVal + " " + (monthsVal == 1 ? "month" : "months");
+            return "~" + months + " " + (months == 1 ? "month" : "months");
         } else {
-            final float days = elapsedTime / DateUtils.DAY_IN_MILLIS;
+            final float days = period.getDays();
 
-            boolean roundUp = days - (int) days > 0.5f;
-            final int daysVal = roundUp ? (int) (days + 1) : (int) days;
-
-            return "~" + daysVal + " " + (daysVal == 1 ? "day" : "days");
+            return "~" + days + " " + (days == 1 ? "day" : "days");
         }
     }
 
@@ -608,13 +591,13 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         mRecurrenceRule = mOptions.getRecurrenceRule();
 
         if (mRecurrencePickerEnabled) {
-            Calendar cal = mDatePickerEnabled ?
+            LocalDate cal = mDatePickerEnabled ?
                     mDatePicker.getSelectedDate().getStartDate()
                     : SUtils.getCalendarForLocale(null, Locale.getDefault());
 
             mSublimeRecurrencePicker.initializeData(mRepeatOptionSetListener,
                     mCurrentRecurrenceOption, mRecurrenceRule,
-                    cal.getTimeInMillis());
+                    cal.toDate().getTime());
         } else {
             removeView(mSublimeRecurrencePicker);
             mSublimeRecurrencePicker = null;

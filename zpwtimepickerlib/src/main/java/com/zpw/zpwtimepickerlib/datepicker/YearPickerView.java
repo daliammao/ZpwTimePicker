@@ -34,7 +34,7 @@ import android.widget.TextView;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
-import java.util.Calendar;
+import org.joda.time.LocalDate;
 
 /**
  * Displays a selectable list of years.
@@ -85,9 +85,8 @@ public class YearPickerView extends ListView {
 
         mAdapter = new YearAdapter(getContext());
         setAdapter(mAdapter);
-        Calendar min = Calendar.getInstance();
-        min.set(1999,10,1);
-        setRange(min,Calendar.getInstance());
+        LocalDate min = new LocalDate(1999,10,1);
+        setRange(min,LocalDate.now());
     }
 
     public void setOnYearSelectedListener(OnYearSelectedListener listener) {
@@ -118,7 +117,7 @@ public class YearPickerView extends ListView {
         setSelectionFromTop(position, offset);
     }
 
-    public void setRange(Calendar min, Calendar max) {
+    public void setRange(LocalDate min, LocalDate max) {
         mAdapter.setRange(min, max);
     }
 
@@ -142,9 +141,9 @@ public class YearPickerView extends ListView {
             mInflater = LayoutInflater.from(context);
         }
 
-        public void setRange(Calendar minDate, Calendar maxDate) {
-            final int minYear = minDate.get(Calendar.YEAR);
-            final int count = maxDate.get(Calendar.YEAR) - minYear + 1;
+        public void setRange(LocalDate minDate, LocalDate maxDate) {
+            final int minYear = minDate.getYear();
+            final int count = maxDate.getYear() - minYear + 1;
 
             if (mMinYear != minYear || mCount != count) {
                 mMinYear = minYear;

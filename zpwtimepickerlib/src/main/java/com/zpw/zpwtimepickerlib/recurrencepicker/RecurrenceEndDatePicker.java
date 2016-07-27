@@ -13,13 +13,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
-import android.util.Config;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DecisionButtonLayout;
 import com.zpw.zpwtimepickerlib.datepicker.DatePicker;
@@ -27,6 +27,9 @@ import com.zpw.zpwtimepickerlib.datepicker.DayPickerView;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
 import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
+
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -51,9 +54,9 @@ public class RecurrenceEndDatePicker extends FrameLayout {
     private RecurrenceEndDatePicker.OnDateSetListener mOnDateSetListener;
 
     private SelectedDate mCurrentDate;
-    private Calendar mTempDate;
-    private Calendar mMinDate;
-    private Calendar mMaxDate;
+    private LocalDate mTempDate;
+    private LocalDate mMinDate;
+    private LocalDate mMaxDate;
 
     private int mFirstDayOfWeek;
 
@@ -68,9 +71,9 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         public void onOkay() {
             if (mOnDateSetListener != null) {
                 mOnDateSetListener.onDateSet(RecurrenceEndDatePicker.this,
-                        mCurrentDate.getStartDate().get(Calendar.YEAR),
-                        mCurrentDate.getStartDate().get(Calendar.MONTH),
-                        mCurrentDate.getStartDate().get(Calendar.DAY_OF_MONTH));
+                        mCurrentDate.getStartDate().getYear(),
+                        mCurrentDate.getStartDate().getMonthOfYear(),
+                        mCurrentDate.getStartDate().getDayOfMonth());
             }
         }
 
@@ -107,13 +110,10 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         mContext = getContext();
 
         setCurrentLocale(Locale.getDefault());
-        mCurrentDate = new SelectedDate(Calendar.getInstance(mCurrentLocale));
-        mTempDate = Calendar.getInstance(mCurrentLocale);
-        mMinDate = Calendar.getInstance(mCurrentLocale);
-        mMaxDate = Calendar.getInstance(mCurrentLocale);
-
-        mMinDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
-        mMaxDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
+        mCurrentDate = new SelectedDate(LocalDate.now());
+        mTempDate = LocalDate.now();
+        mMinDate = new LocalDate(DEFAULT_START_YEAR, Calendar.JANUARY + 1, 1);
+        mMaxDate = new LocalDate(DEFAULT_END_YEAR, Calendar.DECEMBER + 1, 31);
 
         final Resources res = getResources();
         final TypedArray a = mContext.obtainStyledAttributes(attrs,
@@ -132,35 +132,35 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         addView(mContainer);
 
         int firstDayOfWeek = a.getInt(R.styleable.SublimeDatePicker_spFirstDayOfWeek,
-                mCurrentDate.getFirstDate().getFirstDayOfWeek());
+                Calendar.getInstance(mCurrentLocale).getFirstDayOfWeek());
 
         final String minDate = a.getString(R.styleable.SublimeDatePicker_spMinDate);
         final String maxDate = a.getString(R.styleable.SublimeDatePicker_spMaxDate);
 
         // Set up min and max dates.
-        final Calendar tempDate = Calendar.getInstance();
+        LocalDate tempDate = LocalDate.now();
 
         if (!SUtils.parseDate(minDate, tempDate)) {
-            tempDate.set(DEFAULT_START_YEAR, Calendar.JANUARY, 1);
+            tempDate = new LocalDate(DEFAULT_START_YEAR, Calendar.JANUARY + 1, 1);
         }
 
-        final long minDateMillis = tempDate.getTimeInMillis();
+        final LocalDate minLocalDate = tempDate;
 
         if (!SUtils.parseDate(maxDate, tempDate)) {
-            tempDate.set(DEFAULT_END_YEAR, Calendar.DECEMBER, 31);
+            tempDate = new LocalDate(DEFAULT_END_YEAR, Calendar.DECEMBER + 1, 31);
         }
 
-        final long maxDateMillis = tempDate.getTimeInMillis();
+        final LocalDate maxLocalDate = tempDate;
 
-        if (maxDateMillis < minDateMillis) {
+        if (maxLocalDate.isBefore(minLocalDate)) {
             throw new IllegalArgumentException("maxDate must be >= minDate");
         }
 
         final long setDateMillis = SUtils.constrain(
-                System.currentTimeMillis(), minDateMillis, maxDateMillis);
+                System.currentTimeMillis(), minLocalDate.toDate().getTime(), maxLocalDate.toDate().getTime());
 
-        mMinDate.setTimeInMillis(minDateMillis);
-        mMaxDate.setTimeInMillis(maxDateMillis);
+        mMinDate = minLocalDate;
+        mMaxDate = maxLocalDate;
         mCurrentDate.setTimeInMillis(setDateMillis);
 
         a.recycle();
@@ -171,8 +171,8 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         // Set up day picker view.
         mDayPickerView = (DayPickerView) mContainer.findViewById(R.id.redp_day_picker);
         setFirstDayOfWeek(firstDayOfWeek);
-        mDayPickerView.setMinDate(mMinDate.getTimeInMillis());
-        mDayPickerView.setMaxDate(mMaxDate.getTimeInMillis());
+        mDayPickerView.setMinDate(mMinDate);
+        mDayPickerView.setMaxDate(mMaxDate);
         mDayPickerView.setDate(mCurrentDate);
         mDayPickerView.setProxyDaySelectionEventListener(mProxyDaySelectionEventListener);
         mDayPickerView.setCanPickRange(false);
@@ -192,7 +192,7 @@ public class RecurrenceEndDatePicker extends FrameLayout {
     private final DayPickerView.ProxyDaySelectionEventListener mProxyDaySelectionEventListener
             = new DayPickerView.ProxyDaySelectionEventListener() {
         @Override
-        public void onDaySelected(DayPickerView view, Calendar day) {
+        public void onDaySelected(DayPickerView view, LocalDate day) {
             mCurrentDate = new SelectedDate(day);
             onDateChanged(true, true);
         }
@@ -213,7 +213,7 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
         @Override
         public void onDateRangeSelectionUpdated(@NonNull SelectedDate selectedDate) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.i(TAG, "onDateRangeSelectionUpdated: " + selectedDate.toString());
             }
 
@@ -243,7 +243,7 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
         // TODO: This should use live regions.
         if (announce) {
-            final long millis = mCurrentDate.getStartDate().getTimeInMillis();
+            final long millis = mCurrentDate.getStartDate().toDate().getTime();
             final int flags = DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR;
             final String fullDateText = DateUtils.formatDateTime(mContext, millis, flags);
             AccessibilityUtils.makeAnnouncement(mDayPickerView, fullDateText);
@@ -304,7 +304,7 @@ public class RecurrenceEndDatePicker extends FrameLayout {
     }
 
     public long getSelectedDateInMillis() {
-        return mCurrentDate.getStartDate().getTimeInMillis();
+        return mCurrentDate.getStartDate().toDate().getTime();
     }
 
     /**
@@ -315,17 +315,17 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      * @param minDate The minimal supported date.
      */
     public void setMinDate(long minDate) {
-        mTempDate.setTimeInMillis(minDate);
-        if (mTempDate.get(Calendar.YEAR) == mMinDate.get(Calendar.YEAR)
-                && mTempDate.get(Calendar.DAY_OF_YEAR) != mMinDate.get(Calendar.DAY_OF_YEAR)) {
+        mTempDate.withFields(new DateTime(minDate).toLocalDate());
+        if (mTempDate.getYear() == mMinDate.getYear()
+                && mTempDate.getDayOfYear() != mMinDate.getDayOfYear()) {
             return;
         }
-        if (mCurrentDate.getStartDate().before(mTempDate)) {
-            mCurrentDate.getStartDate().setTimeInMillis(minDate);
+        if (mCurrentDate.getStartDate().isBefore(mTempDate)) {
+            mCurrentDate.getStartDate().withFields(mTempDate);
             onDateChanged(false, true);
         }
-        mMinDate.setTimeInMillis(minDate);
-        mDayPickerView.setMinDate(minDate);
+        mMinDate.withFields(mTempDate);
+        mDayPickerView.setMinDate(mMinDate);
     }
 
     /**
@@ -337,29 +337,29 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      * @return The minimal supported date.
      */
     @SuppressWarnings("unused")
-    public Calendar getMinDate() {
+    public LocalDate getMinDate() {
         return mMinDate;
     }
 
     /**
-     * Sets the maximal date supported by this {@link SublimeDatePicker} in
+     * Sets the maximal date supported by this {@link DatePicker} in
      * milliseconds since January 1, 1970 00:00:00 in
      * {@link java.util.TimeZone#getDefault()} time zone.
      *
      * @param maxDate The maximal supported date.
      */
     public void setMaxDate(long maxDate) {
-        mTempDate.setTimeInMillis(maxDate);
-        if (mTempDate.get(Calendar.YEAR) == mMaxDate.get(Calendar.YEAR)
-                && mTempDate.get(Calendar.DAY_OF_YEAR) != mMaxDate.get(Calendar.DAY_OF_YEAR)) {
+        mTempDate.withFields(new DateTime(maxDate).toLocalDate());
+        if (mTempDate.getYear() == mMaxDate.getYear()
+                && mTempDate.getDayOfYear()!= mMaxDate.getDayOfWeek()) {
             return;
         }
-        if (mCurrentDate.getEndDate().after(mTempDate)) {
-            mCurrentDate.getEndDate().setTimeInMillis(maxDate);
+        if (mCurrentDate.getEndDate().isAfter(mTempDate)) {
+            mCurrentDate.getEndDate().withFields(mTempDate);
             onDateChanged(false, true);
         }
-        mMaxDate.setTimeInMillis(maxDate);
-        mDayPickerView.setMaxDate(maxDate);
+        mMaxDate.withFields(mTempDate);
+        mDayPickerView.setMaxDate(mMaxDate);
     }
 
     /**
@@ -371,18 +371,18 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      * @return The maximal supported date.
      */
     @SuppressWarnings("unused")
-    public Calendar getMaxDate() {
+    public LocalDate getMaxDate() {
         return mMaxDate;
     }
 
     public void setFirstDayOfWeek(int firstDayOfWeek) {
         if (firstDayOfWeek < Calendar.SUNDAY || firstDayOfWeek > Calendar.SATURDAY) {
-            if (Config.DEBUG) {
+            if (BuildConfig.DEBUG) {
                 Log.e(TAG, "Provided `firstDayOfWeek` is invalid - it must be between 1 and 7. " +
                         "Given value: " + firstDayOfWeek + " Picker will use the default value for the given locale.");
             }
 
-            firstDayOfWeek = mCurrentDate.getFirstDate().getFirstDayOfWeek();
+            firstDayOfWeek = Calendar.getInstance(mCurrentLocale).getFirstDayOfWeek();
         }
 
         mFirstDayOfWeek = firstDayOfWeek;
@@ -427,8 +427,8 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
         int listPosition = mDayPickerView.getMostVisiblePosition();
 
-        return new SavedState(superState, mCurrentDate, mMinDate.getTimeInMillis(),
-                mMaxDate.getTimeInMillis(), listPosition);
+        return new SavedState(superState, mCurrentDate, mMinDate.toDate().getTime(),
+                mMaxDate.toDate().getTime(), listPosition);
     }
 
     @SuppressLint("NewApi")
@@ -438,13 +438,12 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         super.onRestoreInstanceState(bss.getSuperState());
         SavedState ss = (SavedState) bss;
 
-        Calendar date = Calendar.getInstance(mCurrentLocale);
-        date.set(ss.getSelectedYear(), ss.getSelectedMonth(), ss.getSelectedDay());
+        LocalDate date = new LocalDate(ss.getSelectedYear(), ss.getSelectedMonth(), ss.getSelectedDay());
 
         mCurrentDate.setDate(date);
 
-        mMinDate.setTimeInMillis(ss.getMinDate());
-        mMaxDate.setTimeInMillis(ss.getMaxDate());
+        mMinDate.withFields(new DateTime(ss.getMinDate()).toLocalDate());
+        mMaxDate.withFields(new DateTime(ss.getMaxDate()).toLocalDate());
 
         onCurrentDateChanged(false);
 
@@ -463,7 +462,7 @@ public class RecurrenceEndDatePicker extends FrameLayout {
     @Override
     public void onPopulateAccessibilityEvent(AccessibilityEvent event) {
         super.onPopulateAccessibilityEvent(event);
-        event.getText().add(mCurrentDate.getStartDate().getTime().toString());
+        event.getText().add(mCurrentDate.getStartDate().toString());
     }
 
     public CharSequence getAccessibilityClassName() {
@@ -509,9 +508,9 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         private SavedState(Parcelable superState, SelectedDate selectedDate,
                            long minDate, long maxDate, int listPosition) {
             super(superState);
-            mSelectedYear = selectedDate.getStartDate().get(Calendar.YEAR);
-            mSelectedMonth = selectedDate.getStartDate().get(Calendar.MONTH);
-            mSelectedDay = selectedDate.getStartDate().get(Calendar.DAY_OF_MONTH);
+            mSelectedYear = selectedDate.getStartDate().getYear();
+            mSelectedMonth = selectedDate.getStartDate().getMonthOfYear();
+            mSelectedDay = selectedDate.getStartDate().getDayOfMonth();
             mMinDate = minDate;
             mMaxDate = maxDate;
             mListPosition = listPosition;

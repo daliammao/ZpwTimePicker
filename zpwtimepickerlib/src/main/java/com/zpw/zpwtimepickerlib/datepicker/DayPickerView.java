@@ -34,7 +34,7 @@ import android.widget.ImageButton;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
-import java.util.Calendar;
+import org.joda.time.LocalDate;
 
 /**
  * This displays a list of months in a calendar format with selectable days.
@@ -45,8 +45,8 @@ public class DayPickerView extends ViewGroup {
     private static final int[] ATTRS_TEXT_COLOR = new int[]{android.R.attr.textColor};
 
     private SelectedDate mSelectedDay = null;
-    private final Calendar mMinDate = Calendar.getInstance();
-    private final Calendar mMaxDate = Calendar.getInstance();
+    private final LocalDate mMinDate = LocalDate.now();
+    private final LocalDate mMaxDate = LocalDate.now();
 
     private final AccessibilityManager mAccessibilityManager;
 
@@ -59,7 +59,7 @@ public class DayPickerView extends ViewGroup {
     /**
      * Temporary calendar used for date calculations.
      */
-    private Calendar mTempCalendar;
+    private LocalDate mTempDate;
 
     private ProxyDaySelectionEventListener mProxyDaySelectionEventListener;
 
@@ -196,7 +196,7 @@ public class DayPickerView extends ViewGroup {
         // Proxy selection callbacks to our own listener.
         mAdapter.setDaySelectionEventListener(new DayPickerPagerAdapter.DaySelectionEventListener() {
             @Override
-            public void onDaySelected(DayPickerPagerAdapter adapter, Calendar day) {
+            public void onDaySelected(DayPickerPagerAdapter adapter, LocalDate day) {
                 if (mProxyDaySelectionEventListener != null) {
                     mProxyDaySelectionEventListener.onDaySelected(DayPickerView.this, day);
                 }
@@ -319,7 +319,7 @@ public class DayPickerView extends ViewGroup {
      * Sets the currently selected date to the specified timestamp. Jumps
      * immediately to the new date. To animate to the new date, use
      * {@link #setDate(SelectedDate, boolean)}.
-     * <p/>
+     * <p>
      * //@param timeInMillis the target day in milliseconds
      */
     public void setDate(SelectedDate date) {
@@ -329,7 +329,7 @@ public class DayPickerView extends ViewGroup {
     /**
      * Sets the currently selected date to the specified timestamp. Jumps
      * immediately to the new date, optionally animating the transition.
-     * <p/>
+     * <p>
      * //@param timeInMillis the target day in milliseconds
      *
      * @param animate whether to smooth scroll to the new position
@@ -341,7 +341,7 @@ public class DayPickerView extends ViewGroup {
     /**
      * Sets the currently selected date to the specified timestamp. Jumps
      * immediately to the new date, optionally animating the transition.
-     * <p/>
+     * <p>
      * //@param timeInMillis the target day in milliseconds
      *
      * @param animate whether to smooth scroll to the new position
@@ -353,7 +353,7 @@ public class DayPickerView extends ViewGroup {
     /**
      * Moves to the month containing the specified day, optionally setting the
      * day as selected.
-     * <p/>
+     * <p>
      * //@param timeInMillis the target day in milliseconds
      *
      * @param animate     whether to smooth scroll to the new position
@@ -365,8 +365,7 @@ public class DayPickerView extends ViewGroup {
         }
 
         final int position = getPositionFromDay(
-                mSelectedDay == null ? Calendar.getInstance().getTimeInMillis()
-                        : mSelectedDay.getStartDate().getTimeInMillis());
+                mSelectedDay == null ? LocalDate.now() : mSelectedDay.getStartDate());
 
         if (goToPosition && position != mViewPager.getCurrentItem()) {
             mViewPager.setCurrentItem(position, animate);
@@ -387,24 +386,24 @@ public class DayPickerView extends ViewGroup {
         return mAdapter.getFirstDayOfWeek();
     }
 
-    public void setMinDate(long timeInMillis) {
-        mMinDate.setTimeInMillis(timeInMillis);
+    public void setMinDate(LocalDate date) {
+        mMinDate.withFields(date);
         onRangeChanged();
     }
 
     @SuppressWarnings("unused")
-    public long getMinDate() {
-        return mMinDate.getTimeInMillis();
+    public LocalDate getMinDate() {
+        return mMinDate;
     }
 
-    public void setMaxDate(long timeInMillis) {
-        mMaxDate.setTimeInMillis(timeInMillis);
+    public void setMaxDate(LocalDate date) {
+        mMaxDate.withFields(date);
         onRangeChanged();
     }
 
     @SuppressWarnings("unused")
-    public long getMaxDate() {
-        return mMaxDate.getTimeInMillis();
+    public LocalDate getMaxDate() {
+        return mMaxDate;
     }
 
     /**
@@ -429,23 +428,23 @@ public class DayPickerView extends ViewGroup {
         mProxyDaySelectionEventListener = listener;
     }
 
-    private int getDiffMonths(Calendar start, Calendar end) {
-        final int diffYears = end.get(Calendar.YEAR) - start.get(Calendar.YEAR);
-        return end.get(Calendar.MONTH) - start.get(Calendar.MONTH) + 12 * diffYears;
+    private int getDiffMonths(LocalDate start, LocalDate end) {
+        final int diffYears = end.getYear() - start.getYear();
+        return end.getMonthOfYear() - start.getMonthOfYear() + 12 * diffYears;
     }
 
-    private int getPositionFromDay(long timeInMillis) {
+    private int getPositionFromDay(LocalDate date) {
         final int diffMonthMax = getDiffMonths(mMinDate, mMaxDate);
-        final int diffMonth = getDiffMonths(mMinDate, getTempCalendarForTime(timeInMillis));
+        final int diffMonth = getDiffMonths(mMinDate, getTempDayForTime(date));
         return SUtils.constrain(diffMonth, 0, diffMonthMax);
     }
 
-    private Calendar getTempCalendarForTime(long timeInMillis) {
-        if (mTempCalendar == null) {
-            mTempCalendar = Calendar.getInstance();
+    private LocalDate getTempDayForTime(LocalDate date) {
+        if (mTempDate == null) {
+            mTempDate = LocalDate.now();
         }
-        mTempCalendar.setTimeInMillis(timeInMillis);
-        return mTempCalendar;
+        mTempDate = new LocalDate(date);
+        return mTempDate;
     }
 
     /**
@@ -460,7 +459,7 @@ public class DayPickerView extends ViewGroup {
     }
 
     public interface ProxyDaySelectionEventListener {
-        void onDaySelected(DayPickerView view, Calendar day);
+        void onDaySelected(DayPickerView view, LocalDate day);
 
         void onDateRangeSelectionStarted(@NonNull SelectedDate selectedDate);
 

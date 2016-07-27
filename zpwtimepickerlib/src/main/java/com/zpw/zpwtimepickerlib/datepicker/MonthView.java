@@ -29,6 +29,8 @@ import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
+import org.joda.time.LocalDate;
+
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -929,8 +931,7 @@ public class MonthView extends View {
         }
 
         if (mOnDayClickListener != null) {
-            final Calendar date = Calendar.getInstance();
-            date.set(mYear, mMonth, day);
+            final LocalDate date = new LocalDate(mYear, mMonth, day);
 
             mOnDayClickListener.onDayClick(this, date);
         }
@@ -1042,13 +1043,12 @@ public class MonthView extends View {
         }
     }
 
-    public Calendar composeDate(int day) {
+    public LocalDate composeDate(int day) {
         if (!isValidDayOfMonth(day) || !isDayEnabled(day)) {
             return null;
         }
 
-        final Calendar date = Calendar.getInstance();
-        date.set(mYear, mMonth, day);
+        final LocalDate date = new LocalDate(mYear, mMonth, day);
         return date;
     }
 
@@ -1122,6 +1122,6 @@ public class MonthView extends View {
      * Handles callbacks when the user clicks on a time object.
      */
     public interface OnDayClickListener {
-        void onDayClick(MonthView view, Calendar day);
+        void onDayClick(MonthView view, LocalDate day);
     }
 }

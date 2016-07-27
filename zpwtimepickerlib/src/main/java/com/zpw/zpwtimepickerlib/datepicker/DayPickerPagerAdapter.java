@@ -34,7 +34,11 @@ import android.view.ViewGroup;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
+
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * An adapter for a list of {@link MonthView} items.
@@ -45,8 +49,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
 
     private static final int MONTHS_IN_YEAR = 12;
 
-    private final Calendar mMinDate = Calendar.getInstance();
-    private final Calendar mMaxDate = Calendar.getInstance();
+    private final LocalDate mMinDate = LocalDate.now();
+    private final LocalDate mMaxDate = LocalDate.now();
 
     private final SparseArray<ViewHolder> mItems = new SparseArray<>();
 
@@ -70,7 +74,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
     private int mFirstDayOfWeek;
 
     // used in resolving start/end dates during range selection
-    private final SelectedDate mTempSelectedDay = new SelectedDate(Calendar.getInstance());
+    private final SelectedDate mTempSelectedDay = new SelectedDate(LocalDate.now());
 
     public DayPickerPagerAdapter(@NonNull Context context, @LayoutRes int layoutResId,
                                  @IdRes int calendarViewId) {
@@ -84,12 +88,12 @@ class DayPickerPagerAdapter extends PagerAdapter {
         ta.recycle();
     }
 
-    public void setRange(@NonNull Calendar min, @NonNull Calendar max) {
-        mMinDate.setTimeInMillis(min.getTimeInMillis());
-        mMaxDate.setTimeInMillis(max.getTimeInMillis());
+    public void setRange(@NonNull LocalDate min, @NonNull LocalDate max) {
+        mMinDate.withFields(min);
+        mMaxDate.withFields(max);
 
-        final int diffYear = mMaxDate.get(Calendar.YEAR) - mMinDate.get(Calendar.YEAR);
-        final int diffMonth = mMaxDate.get(Calendar.MONTH) - mMinDate.get(Calendar.MONTH);
+        final int diffYear = mMaxDate.getYear() - mMinDate.getYear();
+        final int diffMonth = mMaxDate.getMonthOfYear() - mMinDate.getMonthOfYear();
         mCount = diffMonth + MONTHS_IN_YEAR * diffYear + 1;
 
         // Positions are now invalid, clear everything and start over.
@@ -143,7 +147,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             if (newPosition.length == 1) {
                 final ViewHolder newMonthView = mItems.get(newPosition[0], null);
                 if (newMonthView != null) {
-                    final int dayOfMonth = day.getFirstDate().get(Calendar.DAY_OF_MONTH);
+                    final int dayOfMonth = day.getFirstDate().getDayOfMonth();
                     newMonthView.calendar.setSelectedDays(dayOfMonth, dayOfMonth, SelectedDate.Type.SINGLE);
                 }
             } else if (newPosition.length == 2) {
@@ -152,8 +156,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
                 if (rangeIsInSameMonth) {
                     final ViewHolder newMonthView = mItems.get(newPosition[0], null);
                     if (newMonthView != null) {
-                        final int startDayOfMonth = day.getFirstDate().get(Calendar.DAY_OF_MONTH);
-                        final int endDayOfMonth = day.getSecondDate().get(Calendar.DAY_OF_MONTH);
+                        final int startDayOfMonth = day.getFirstDate().getDayOfMonth();
+                        final int endDayOfMonth = day.getSecondDate().getDayOfMonth();
 
                         newMonthView.calendar.setSelectedDays(startDayOfMonth, endDayOfMonth, SelectedDate.Type.RANGE);
                     }
@@ -161,9 +165,12 @@ class DayPickerPagerAdapter extends PagerAdapter {
                     // Deal with starting month
                     final ViewHolder newMonthViewStart = mItems.get(newPosition[0], null);
                     if (newMonthViewStart != null) {
-                        final int startDayOfMonth = day.getFirstDate().get(Calendar.DAY_OF_MONTH);
+                        final int startDayOfMonth = day.getFirstDate().getDayOfMonth();
                         // TODO: Check this
-                        final int endDayOfMonth = day.getFirstDate().getActualMaximum(Calendar.DATE);
+                        final int endDayOfMonth = day.getFirstDate()
+                                .toDateTime(LocalTime.now())
+                                .toCalendar(Locale.getDefault())
+                                .getActualMaximum(Calendar.DATE);
 
                         newMonthViewStart.calendar.setSelectedDays(startDayOfMonth, endDayOfMonth, SelectedDate.Type.RANGE);
                     }
@@ -178,9 +185,9 @@ class DayPickerPagerAdapter extends PagerAdapter {
                     // Deal with ending month
                     final ViewHolder newMonthViewEnd = mItems.get(newPosition[1], null);
                     if (newMonthViewEnd != null) {
-                        final int startDayOfMonth = day.getSecondDate().getMinimum(Calendar.DATE);
+                        final int startDayOfMonth = Calendar.getInstance().getMinimum(Calendar.DATE);
                         // TODO: Check this
-                        final int endDayOfMonth = day.getSecondDate().get(Calendar.DAY_OF_MONTH);
+                        final int endDayOfMonth = day.getSecondDate().getDayOfMonth();
 
                         newMonthViewEnd.calendar.setSelectedDays(startDayOfMonth, endDayOfMonth, SelectedDate.Type.RANGE);
                     }
@@ -241,22 +248,22 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     private int getMonthForPosition(int position) {
-        return (position + mMinDate.get(Calendar.MONTH)) % MONTHS_IN_YEAR;
+        return (position + mMinDate.getMonthOfYear()) % MONTHS_IN_YEAR;
     }
 
     private int getYearForPosition(int position) {
-        final int yearOffset = (position + mMinDate.get(Calendar.MONTH)) / MONTHS_IN_YEAR;
-        return yearOffset + mMinDate.get(Calendar.YEAR);
+        final int yearOffset = (position + mMinDate.getMonthOfYear()) / MONTHS_IN_YEAR;
+        return yearOffset + mMinDate.getYear();
     }
 
     @SuppressWarnings("unused")
-    private int getPositionForDay(@Nullable Calendar day) {
+    private int getPositionForDay(@Nullable LocalDate day) {
         if (day == null) {
             return -1;
         }
 
-        final int yearOffset = day.get(Calendar.YEAR) - mMinDate.get(Calendar.YEAR);
-        final int monthOffset = day.get(Calendar.MONTH) - mMinDate.get(Calendar.MONTH);
+        final int yearOffset = day.getYear() - mMinDate.getYear();
+        final int monthOffset = day.getMonthOfYear() - mMinDate.getMonthOfYear();
         return (yearOffset * MONTHS_IN_YEAR + monthOffset);
     }
 
@@ -310,15 +317,15 @@ class DayPickerPagerAdapter extends PagerAdapter {
         final int[] selectedDay = resolveSelectedDayBasedOnType(month, year);
 
         final int enabledDayRangeStart;
-        if (mMinDate.get(Calendar.MONTH) == month && mMinDate.get(Calendar.YEAR) == year) {
-            enabledDayRangeStart = mMinDate.get(Calendar.DAY_OF_MONTH);
+        if (mMinDate.getMonthOfYear() == month && mMinDate.getYear() == year) {
+            enabledDayRangeStart = mMinDate.getDayOfMonth();
         } else {
             enabledDayRangeStart = 1;
         }
 
         final int enabledDayRangeEnd;
-        if (mMaxDate.get(Calendar.MONTH) == month && mMaxDate.get(Calendar.YEAR) == year) {
-            enabledDayRangeEnd = mMaxDate.get(Calendar.DAY_OF_MONTH);
+        if (mMaxDate.getMonthOfYear() == month && mMaxDate.getYear() == year) {
+            enabledDayRangeEnd = mMaxDate.getDayOfMonth();
         } else {
             enabledDayRangeEnd = 31;
         }
@@ -364,7 +371,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
 
     private final MonthView.OnDayClickListener mOnDayClickListener = new MonthView.OnDayClickListener() {
         @Override
-        public void onDayClick(MonthView view, Calendar day) {
+        public void onDayClick(MonthView view, LocalDate day) {
             if (day != null) {
                 if (mDaySelectionEventListener != null) {
                     mDaySelectionEventListener.onDaySelected(DayPickerPagerAdapter.this, day);
@@ -390,7 +397,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             final ViewHolder newMonthView = mItems.get(position, null);
             if (newMonthView != null) {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
-                Calendar selectedDayStart = newMonthView.calendar.composeDate(dayOfMonth);
+                LocalDate selectedDayStart = newMonthView.calendar.composeDate(dayOfMonth);
                 if (selectedDayStart != null) {
                     mTempSelectedDay.setDate(selectedDayStart);
                     return mTempSelectedDay;
@@ -406,10 +413,10 @@ class DayPickerPagerAdapter extends PagerAdapter {
             final ViewHolder newMonthView = mItems.get(position, null);
             if (newMonthView != null) {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
-                Calendar selectedDayEnd = newMonthView.calendar.composeDate(dayOfMonth);
+                LocalDate selectedDayEnd = newMonthView.calendar.composeDate(dayOfMonth);
 
                 if (selectedDayEnd != null && (!updateIfNecessary
-                        || mSelectedDay.getSecondDate().getTimeInMillis() != selectedDayEnd.getTimeInMillis())) {
+                        || !mSelectedDay.getSecondDate().isEqual(selectedDayEnd))) {
                     mTempSelectedDay.setSecondDate(selectedDayEnd);
                     return mTempSelectedDay;
                 }
@@ -434,9 +441,9 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     private int[] resolveSelectedDayForTypeSingle(int month, int year) {
-        if (mSelectedDay.getFirstDate().get(Calendar.MONTH) == month
-                && mSelectedDay.getFirstDate().get(Calendar.YEAR) == year) {
-            int resolvedDay = mSelectedDay.getFirstDate().get(Calendar.DAY_OF_MONTH);
+        if (mSelectedDay.getFirstDate().getMonthOfYear() == month
+                && mSelectedDay.getFirstDate().getYear() == year) {
+            int resolvedDay = mSelectedDay.getFirstDate().getDayOfMonth();
             return new int[]{resolvedDay, resolvedDay};
         }
 
@@ -445,23 +452,23 @@ class DayPickerPagerAdapter extends PagerAdapter {
 
     private int[] resolveSelectedDayForTypeRange(int month, int year) {
         // Quan: "year.month" Eg: Feb, 2015 ==> 2015.02, Dec, 2000 ==> 2000.12
-        float startDateQuan = mSelectedDay.getStartDate().get(Calendar.YEAR)
-                + (mSelectedDay.getStartDate().get(Calendar.MONTH) + 1) / 100f;
-        float endDateQuan = mSelectedDay.getEndDate().get(Calendar.YEAR)
-                + (mSelectedDay.getEndDate().get(Calendar.MONTH) + 1) / 100f;
+        float startDateQuan = mSelectedDay.getStartDate().getYear()
+                + mSelectedDay.getStartDate().getMonthOfYear() / 100f;
+        float endDateQuan = mSelectedDay.getEndDate().getYear()
+                + mSelectedDay.getEndDate().getMonthOfYear() / 100f;
 
         float dateQuan = year + (month + 1) / 100f;
 
         if (dateQuan >= startDateQuan && dateQuan <= endDateQuan) {
             int startDay, endDay;
             if (dateQuan == startDateQuan) {
-                startDay = mSelectedDay.getStartDate().get(Calendar.DAY_OF_MONTH);
+                startDay = mSelectedDay.getStartDate().getDayOfMonth();
             } else {
                 startDay = 1;
             }
 
             if (dateQuan == endDateQuan) {
-                endDay = mSelectedDay.getEndDate().get(Calendar.DAY_OF_MONTH);
+                endDay = mSelectedDay.getEndDate().getDayOfMonth();
             } else {
                 endDay = SUtils.getDaysInMonth(month, year);
             }
@@ -491,7 +498,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     public interface DaySelectionEventListener {
-        void onDaySelected(DayPickerPagerAdapter view, Calendar day);
+        void onDaySelected(DayPickerPagerAdapter view, LocalDate day);
 
         void onDateRangeSelectionStarted(@NonNull SelectedDate selectedDate);
 
