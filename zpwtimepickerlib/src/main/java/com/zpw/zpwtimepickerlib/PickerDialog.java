@@ -72,15 +72,6 @@ public class PickerDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        /*try {
-            //getActivity().getLayoutInflater()
-                    //.inflate(R.layout.sublime_recurrence_picker, new FrameLayout(getActivity()), true);
-            getActivity().getLayoutInflater()
-                    .inflate(R.layout.sublime_date_picker, new FrameLayout(getActivity()), true);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }*/
 
         mDateTimePicker = (DateTimePicker) getActivity()
                 .getLayoutInflater().inflate(R.layout.sublime_picker, container);

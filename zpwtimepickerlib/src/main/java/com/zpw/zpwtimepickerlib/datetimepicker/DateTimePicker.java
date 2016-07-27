@@ -49,11 +49,10 @@ import com.zpw.zpwtimepickerlib.utilities.SUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
-import java.text.DateFormat;
-import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * A customizable view that provisions picking of a date,
@@ -108,7 +107,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
 
     // Used if listener returns
     // null/invalid(zero-length, empty) string
-    private DateFormat mDefaultDateFormatter, mDefaultTimeFormatter;
+    private DateTimeFormatter mDefaultDateFormatter, mDefaultTimeFormatter;
 
     // Listener for recurrence picker
     private final RecurrencePicker.OnRepeatOptionSetListener mRepeatOptionSetListener = new RecurrencePicker.OnRepeatOptionSetListener() {
@@ -144,7 +143,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
             }
 
             if (mDatePickerEnabled) {
-                selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(new LocalTime(hour,minute),LocalTime.now());
+                selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(new LocalTime(hour, minute), LocalTime.now());
             }
 
             RecurrencePicker.RecurrenceOption recurrenceOption
@@ -216,20 +215,17 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         LayoutInflater.from(context).inflate(R.layout.sublime_picker_view_layout,
                 this, true);
 
-        mDefaultDateFormatter = DateFormat.getDateInstance(DateFormat.MEDIUM,
-                Locale.getDefault());
-        mDefaultTimeFormatter = DateFormat.getTimeInstance(DateFormat.SHORT,
-                Locale.getDefault());
-        mDefaultTimeFormatter.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        mDefaultDateFormatter = DateTimeFormat.forPattern("YYYY-MM-DD");
+        mDefaultTimeFormatter = DateTimeFormat.forPattern("HH:mm");
 
         llMainContentHolder = (LinearLayout) findViewById(R.id.llMainContentHolder);
         mButtonLayout = new ButtonHandler(this);
-        initializeRecurrencePickerSwitch();
 
         mDatePicker = (DatePicker) findViewById(R.id.datePicker);
         mTimePicker = (TimePicker) findViewById(R.id.timePicker);
-        mSublimeRecurrencePicker = (RecurrencePicker)
-                findViewById(R.id.repeat_option_picker);
+        mSublimeRecurrencePicker = (RecurrencePicker) findViewById(R.id.repeat_option_picker);
+
+        initializeRecurrencePickerSwitch();
     }
 
     public void initializePicker(Options options, ListenerAdapter listener) {
@@ -293,13 +289,12 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
             llMainContentHolder.setVisibility(View.VISIBLE);
 
             if (mButtonLayout.isSwitcherButtonEnabled()) {
-                Date toFormat = new Date(mTimePicker.getCurrentHour() * DateUtils.HOUR_IN_MILLIS
-                        + mTimePicker.getCurrentMinute() * DateUtils.MINUTE_IN_MILLIS);
+                LocalTime toFormat = new LocalTime(mTimePicker.getCurrentHour(),mTimePicker.getCurrentMinute());
 
                 switchButtonText = mListener.formatTime(toFormat);
 
                 if (TextUtils.isEmpty(switchButtonText)) {
-                    switchButtonText = mDefaultTimeFormatter.format(toFormat);
+                    switchButtonText = toFormat.toString(mDefaultTimeFormatter);
                 }
 
                 mButtonLayout.updateSwitcherText(Options.Picker.DATE_PICKER, switchButtonText);
@@ -326,8 +321,8 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
 
                 if (TextUtils.isEmpty(switchButtonText)) {
                     if (selectedDate.getType() == SelectedDate.Type.SINGLE) {
-                        Date toFormat = new Date(mDatePicker.getSelectedDateInMillis());
-                        switchButtonText = mDefaultDateFormatter.format(toFormat);
+                        LocalDate toFormat = new LocalDate(selectedDate.getStartDate());
+                        switchButtonText = toFormat.toString(mDefaultDateFormatter);
                     } else if (selectedDate.getType() == SelectedDate.Type.RANGE) {
                         switchButtonText = formatDateRange(selectedDate);
                     }
@@ -354,13 +349,13 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         // Move to next day since we are nulling out the time fields
         endDate.plusDays(1);
 
-        Period period = new Period(startDate,endDate);
+        Period period = new Period(startDate, endDate);
 
-        if (period.getYears()>0) {
+        if (period.getYears() > 0) {
             final int years = period.getYears();
 
             return "~" + years + " " + (years == 1 ? "year" : "years");
-        } else if (period.getMonths()>0) {
+        } else if (period.getMonths() > 0) {
             final float months = period.getMonths();
 
             return "~" + months + " " + (months == 1 ? "month" : "months");
@@ -372,8 +367,8 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     }
 
     private void initializeRecurrencePickerSwitch() {
-        ivRecurrenceOptionsDP = (ImageView) findViewById(R.id.ivRecurrenceOptionsDP);
-        ivRecurrenceOptionsTP = (ImageView) findViewById(R.id.ivRecurrenceOptionsTP);
+        ivRecurrenceOptionsDP = (ImageView) mDatePicker.findViewById(R.id.ivRecurrenceOptionsDP);
+        ivRecurrenceOptionsTP = (ImageView) mTimePicker.findViewById(R.id.ivRecurrenceOptionsTP);
 
         int iconColor, pressedStateBgColor;
 
@@ -616,9 +611,9 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     public void onDateChanged(DatePicker view, SelectedDate selectedDate) {
         // TODO: Consider removing this propagation of date change event altogether
         //mDatePicker.init(selectedDate.getStartDate().get(Calendar.YEAR),
-                //selectedDate.getStartDate().get(Calendar.MONTH),
-                //selectedDate.getStartDate().get(Calendar.DAY_OF_MONTH),
-                //mOptions.canPickDateRange(), this);
+        //selectedDate.getStartDate().get(Calendar.MONTH),
+        //selectedDate.getStartDate().get(Calendar.DAY_OF_MONTH),
+        //mOptions.canPickDateRange(), this);
         mDatePicker.init(selectedDate, mOptions.canPickDateRange(), this);
     }
 

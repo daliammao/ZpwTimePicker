@@ -16,12 +16,12 @@
 
 package com.zpw.zpwtimepickerlib.helpers;
 
-import com.zpw.zpwtimepickerlib.datetimepicker.DateTimePicker;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
+import com.zpw.zpwtimepickerlib.datetimepicker.DateTimePicker;
 import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
 
-import java.util.Date;
+import org.joda.time.LocalTime;
 
 public abstract class ListenerAdapter {
     /**
@@ -57,7 +57,7 @@ public abstract class ListenerAdapter {
      * @return Formatted time to display on `Switcher` button
      */
     @SuppressWarnings("UnusedParameters")
-    public CharSequence formatTime(Date selectedTime) {
+    public CharSequence formatTime(LocalTime selectedTime) {
         return null;
     }
 }
