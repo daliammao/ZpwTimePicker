@@ -42,17 +42,13 @@ import android.widget.ImageView;
 import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -425,18 +421,15 @@ public class SUtils {
      */
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormat.forPattern(DATE_FORMAT);
 
-    public static boolean parseDate(String date, LocalDate outDate) {
+    public static LocalDate parseDate(String date) throws ParseException {
         if (date == null || date.isEmpty()) {
-            return false;
+            throw new ParseException("Input string is null",0);
         }
 
         try {
-            final LocalDate parsedDate = LocalDate.parse(date,DATE_FORMATTER);
-            outDate.withFields(parsedDate);
-            return true;
+            return LocalDate.parse(date,DATE_FORMATTER);
         } catch (Exception e) {
-            Log.w(TAG, "Date: " + date + " not in format: " + DATE_FORMAT);
-            return false;
+            throw new ParseException("Date: " + date + " not in format: " + DATE_FORMAT,0);
         }
     }
 
@@ -457,7 +450,7 @@ public class SUtils {
     }
 
     public static int getDaysInMonth(int month, int year) {
-        switch (month) {
+        switch (month-1) {
             case Calendar.JANUARY:
             case Calendar.MARCH:
             case Calendar.MAY:

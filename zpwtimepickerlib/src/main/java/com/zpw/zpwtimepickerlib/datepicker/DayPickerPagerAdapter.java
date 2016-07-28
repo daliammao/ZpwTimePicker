@@ -49,8 +49,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
 
     private static final int MONTHS_IN_YEAR = 12;
 
-    private final LocalDate mMinDate = LocalDate.now();
-    private final LocalDate mMaxDate = LocalDate.now();
+    private LocalDate mMinDate = LocalDate.now();
+    private LocalDate mMaxDate = LocalDate.now();
 
     private final SparseArray<ViewHolder> mItems = new SparseArray<>();
 
@@ -89,8 +89,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     public void setRange(@NonNull LocalDate min, @NonNull LocalDate max) {
-        mMinDate.withFields(min);
-        mMaxDate.withFields(max);
+        mMinDate = min;
+        mMaxDate = max;
 
         final int diffYear = mMaxDate.getYear() - mMinDate.getYear();
         final int diffMonth = mMaxDate.getMonthOfYear() - mMinDate.getMonthOfYear();
@@ -147,7 +147,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             if (newPosition.length == 1) {
                 final ViewHolder newMonthView = mItems.get(newPosition[0], null);
                 if (newMonthView != null) {
-                    final int dayOfMonth = day.getFirstDate().getDayOfMonth();
+                    final int dayOfMonth = day.getStartDate().getDayOfMonth();
                     newMonthView.calendar.setSelectedDays(dayOfMonth, dayOfMonth, SelectedDate.Type.SINGLE);
                 }
             } else if (newPosition.length == 2) {
@@ -156,8 +156,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
                 if (rangeIsInSameMonth) {
                     final ViewHolder newMonthView = mItems.get(newPosition[0], null);
                     if (newMonthView != null) {
-                        final int startDayOfMonth = day.getFirstDate().getDayOfMonth();
-                        final int endDayOfMonth = day.getSecondDate().getDayOfMonth();
+                        final int startDayOfMonth = day.getStartDate().getDayOfMonth();
+                        final int endDayOfMonth = day.getEndDate().getDayOfMonth();
 
                         newMonthView.calendar.setSelectedDays(startDayOfMonth, endDayOfMonth, SelectedDate.Type.RANGE);
                     }
@@ -165,9 +165,9 @@ class DayPickerPagerAdapter extends PagerAdapter {
                     // Deal with starting month
                     final ViewHolder newMonthViewStart = mItems.get(newPosition[0], null);
                     if (newMonthViewStart != null) {
-                        final int startDayOfMonth = day.getFirstDate().getDayOfMonth();
+                        final int startDayOfMonth = day.getStartDate().getDayOfMonth();
                         // TODO: Check this
-                        final int endDayOfMonth = day.getFirstDate()
+                        final int endDayOfMonth = day.getStartDate()
                                 .toDateTime(LocalTime.now())
                                 .toCalendar(Locale.getDefault())
                                 .getActualMaximum(Calendar.DATE);
@@ -187,7 +187,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
                     if (newMonthViewEnd != null) {
                         final int startDayOfMonth = Calendar.getInstance().getMinimum(Calendar.DATE);
                         // TODO: Check this
-                        final int endDayOfMonth = day.getSecondDate().getDayOfMonth();
+                        final int endDayOfMonth = day.getEndDate().getDayOfMonth();
 
                         newMonthViewEnd.calendar.setSelectedDays(startDayOfMonth, endDayOfMonth, SelectedDate.Type.RANGE);
                     }
@@ -277,11 +277,11 @@ class DayPickerPagerAdapter extends PagerAdapter {
 
         if (typeOfDay == SelectedDate.Type.SINGLE) {
             positions = new int[1];
-            positions[0] = getPositionForDay(day.getFirstDate());
+            positions[0] = getPositionForDay(day.getStartDate());
         } else if (typeOfDay == SelectedDate.Type.RANGE) {
             positions = new int[2];
-            positions[0] = getPositionForDay(day.getFirstDate());
-            positions[1] = getPositionForDay(day.getSecondDate());
+            positions[0] = getPositionForDay(day.getStartDate());
+            positions[1] = getPositionForDay(day.getEndDate());
         }
 
         return positions;
@@ -416,8 +416,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
                 LocalDate selectedDayEnd = newMonthView.calendar.composeDate(dayOfMonth);
 
                 if (selectedDayEnd != null && (!updateIfNecessary
-                        || !mSelectedDay.getSecondDate().isEqual(selectedDayEnd))) {
-                    mTempSelectedDay.setSecondDate(selectedDayEnd);
+                        || !mSelectedDay.getEndDate().isEqual(selectedDayEnd))) {
+                    mTempSelectedDay.setEndDate(selectedDayEnd);
                     return mTempSelectedDay;
                 }
             }
@@ -441,9 +441,9 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     private int[] resolveSelectedDayForTypeSingle(int month, int year) {
-        if (mSelectedDay.getFirstDate().getMonthOfYear() == month
-                && mSelectedDay.getFirstDate().getYear() == year) {
-            int resolvedDay = mSelectedDay.getFirstDate().getDayOfMonth();
+        if (mSelectedDay.getStartDate().getMonthOfYear() == month
+                && mSelectedDay.getStartDate().getYear() == year) {
+            int resolvedDay = mSelectedDay.getStartDate().getDayOfMonth();
             return new int[]{resolvedDay, resolvedDay};
         }
 

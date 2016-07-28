@@ -31,25 +31,9 @@ public class SelectedDateTime {
         mSecondDateTime = DateTime.now();
 
         if (date != null) {
-            mFirstDateTime.withMillis(date.getStartDate().getMillis());
-            mSecondDateTime.withMillis(date.getEndDate().getMillis());
+            mFirstDateTime = new DateTime(date.getStartDateTime().getMillis());
+            mSecondDateTime = new DateTime(date.getEndDateTime().getMillis());
         }
-    }
-
-    public DateTime getFirstDateTime() {
-        return mFirstDateTime;
-    }
-
-    public void setFirstDate(DateTime firstDateTime) {
-        mFirstDateTime = firstDateTime;
-    }
-
-    public DateTime getSecondDateTime() {
-        return mSecondDateTime;
-    }
-
-    public void setSecondDateTime(DateTime secondDateTime) {
-        mSecondDateTime = secondDateTime;
     }
 
     public void setDateTime(DateTime dateTime) {
@@ -57,12 +41,28 @@ public class SelectedDateTime {
         mSecondDateTime = dateTime;
     }
 
-    public DateTime getStartDate() {
+    public DateTime getStartDateTime() {
         return compareDates(mFirstDateTime, mSecondDateTime) == -1 ? mFirstDateTime : mSecondDateTime;
     }
 
-    public DateTime getEndDate() {
+    public void setStartDateTime(DateTime startDateTime) {
+        if (compareDates(mFirstDateTime, mSecondDateTime) == -1) {
+            mFirstDateTime = startDateTime;
+        } else {
+            mSecondDateTime = startDateTime;
+        }
+    }
+
+    public DateTime getEndDateTime() {
         return compareDates(mFirstDateTime, mSecondDateTime) == 1 ? mFirstDateTime : mSecondDateTime;
+    }
+
+    public void setEndDateTime(DateTime endDateTime) {
+        if (compareDates(mFirstDateTime, mSecondDateTime) == 1) {
+            mFirstDateTime = endDateTime;
+        } else {
+            mSecondDateTime = endDateTime;
+        }
     }
 
     public Type getType() {
@@ -94,8 +94,8 @@ public class SelectedDateTime {
     }
 
     public void setTimeInMillis(long timeInMillis) {
-        mFirstDateTime.withMillis(timeInMillis);
-        mSecondDateTime.withMillis(timeInMillis);
+        mFirstDateTime = new DateTime(timeInMillis);
+        mSecondDateTime = new DateTime(timeInMillis);
     }
 
     @Override

@@ -25,7 +25,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.ContextThemeWrapper;
@@ -66,9 +65,6 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         DatePicker.DatePickerValidationCallback,
         TimePicker.TimePickerValidationCallback {
     private static final String TAG = DateTimePicker.class.getSimpleName();
-
-    // Used for formatting date range
-    private static final long MONTH_IN_MILLIS = DateUtils.YEAR_IN_MILLIS / 12;
 
     // Container for 'SublimeDatePicker' & 'SublimeTimePicker'
     private LinearLayout llMainContentHolder;
@@ -347,7 +343,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         LocalDate endDate = selectedDate.getEndDate();
 
         // Move to next day since we are nulling out the time fields
-        endDate.plusDays(1);
+        endDate = endDate.plusDays(1);
 
         Period period = new Period(startDate, endDate);
 
@@ -527,21 +523,15 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         mRecurrencePickerEnabled = mOptions.isRecurrencePickerActive();
 
         if (mDatePickerEnabled) {
-            //int[] dateParams = mOptions.getDateParams();
-            //mDatePicker.init(dateParams[0] /* year */,
-            //        dateParams[1] /* month of year */,
-            //        dateParams[2] /* day of month */,
-            //        mOptions.canPickDateRange(),
-            //        this);
             mDatePicker.init(mOptions.getDateParams(), mOptions.canPickDateRange(), this);
 
             long[] dateRange = mOptions.getDateRange();
 
-            if (dateRange[0] /* min date */ != Long.MIN_VALUE) {
+            if (dateRange[0] /* min date */ > Long.MIN_VALUE) {
                 mDatePicker.setMinDate(dateRange[0]);
             }
 
-            if (dateRange[1] /* max date */ != Long.MIN_VALUE) {
+            if (dateRange[1] /* max date */ > Long.MIN_VALUE) {
                 mDatePicker.setMaxDate(dateRange[1]);
             }
 
@@ -610,10 +600,6 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     @Override
     public void onDateChanged(DatePicker view, SelectedDate selectedDate) {
         // TODO: Consider removing this propagation of date change event altogether
-        //mDatePicker.init(selectedDate.getStartDate().get(Calendar.YEAR),
-        //selectedDate.getStartDate().get(Calendar.MONTH),
-        //selectedDate.getStartDate().get(Calendar.DAY_OF_MONTH),
-        //mOptions.canPickDateRange(), this);
         mDatePicker.init(selectedDate, mOptions.canPickDateRange(), this);
     }
 

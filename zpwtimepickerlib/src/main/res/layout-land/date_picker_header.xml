@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2015 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,8 @@
      limitations under the License.
 -->
 
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/date_picker_header"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -26,11 +25,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingStart="?attr/dialogPreferredPadding"
-        android:paddingLeft="?attr/dialogPreferredPadding"
+        android:paddingBottom="18dp"
         android:paddingEnd="?attr/dialogPreferredPadding"
+        android:paddingLeft="?attr/dialogPreferredPadding"
         android:paddingRight="?attr/dialogPreferredPadding"
-        android:paddingBottom="18dp">
+        android:paddingStart="?attr/dialogPreferredPadding">
 
         <!-- Top padding should stay on this view so that
          the touch target is a bit larger. -->
@@ -39,16 +38,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="16dp"
-            android:textAppearance="@style/SPYearLabelTextAppearance" />
+            android:textAppearance="@style/SPYearLabelTextAppearance"
+            tools:text="2016"/>
 
         <TextView
             android:id="@+id/date_picker_header_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/SPDateLabelTextAppearance"
+            android:ellipsize="none"
             android:gravity="start"
             android:maxLines="2"
-            android:ellipsize="none" />
+            android:textAppearance="@style/SPDateLabelTextAppearance"
+            tools:text="2016年7月27日 周三"/>
 
     </LinearLayout>
 
@@ -57,41 +58,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="invisible"
-        android:paddingStart="?attr/dialogPreferredPadding"
-        android:paddingLeft="?attr/dialogPreferredPadding"
+        android:paddingBottom="18dp"
         android:paddingEnd="?attr/dialogPreferredPadding"
+        android:paddingLeft="?attr/dialogPreferredPadding"
         android:paddingRight="?attr/dialogPreferredPadding"
-        android:paddingBottom="18dp">
+        android:paddingStart="?attr/dialogPreferredPadding"
+        android:visibility="invisible"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/tv_header_date_start"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/SPDateRangeLabelTextAppearance"
+            android:ellipsize="none"
             android:gravity="start"
             android:maxLines="3"
             android:paddingTop="32dp"
-            android:ellipsize="none" />
+            android:textAppearance="@style/SPDateRangeLabelTextAppearance"
+            tools:text="2016年7月27日 周三"/>
 
         <TextView
             android:id="@+id/tv_header_date_end"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/SPDateRangeLabelTextAppearance"
+            android:ellipsize="none"
             android:gravity="start"
-            android:paddingTop="32dp"
             android:maxLines="3"
-            android:ellipsize="none" />
+            android:paddingTop="32dp"
+            android:textAppearance="@style/SPDateRangeLabelTextAppearance"
+            tools:text="2016年7月28日 周三"/>
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_gravity="top|end|right"
         android:layout_marginTop="6dp"
-        android:layout_gravity="top|end|right">
+        android:orientation="horizontal">
 
         <ImageView
             android:id="@+id/iv_header_date_reset"
@@ -99,12 +103,13 @@
             android:layout_height="wrap_content"
             android:padding="6dp"
             android:src="@drawable/reset_ff"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <ImageView
             android:id="@+id/ivRecurrenceOptionsDP"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
@@ -113,13 +118,14 @@
         style="?attr/spLandscapeButtonModeSwitcherButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginStart="@dimen/sp_button_bar_padding_start"
-        android:layout_marginLeft="@dimen/sp_button_bar_padding_start"
-        android:layout_marginEnd="@dimen/sp_button_bar_padding_end"
-        android:layout_marginRight="@dimen/sp_button_bar_padding_end"
-        android:layout_marginTop="@dimen/sp_button_bar_padding_top"
+        android:layout_gravity="center_horizontal|bottom"
         android:layout_marginBottom="@dimen/sp_button_bar_padding_bottom"
-        android:layout_gravity="center_horizontal|bottom" />
+        android:layout_marginEnd="@dimen/sp_button_bar_padding_end"
+        android:layout_marginLeft="@dimen/sp_button_bar_padding_start"
+        android:layout_marginRight="@dimen/sp_button_bar_padding_end"
+        android:layout_marginStart="@dimen/sp_button_bar_padding_start"
+        android:layout_marginTop="@dimen/sp_button_bar_padding_top"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
 </FrameLayout>

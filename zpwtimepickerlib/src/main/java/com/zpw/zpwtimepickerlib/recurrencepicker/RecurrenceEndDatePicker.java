@@ -31,6 +31,7 @@ import com.zpw.zpwtimepickerlib.utilities.SUtils;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -140,13 +141,17 @@ public class RecurrenceEndDatePicker extends FrameLayout {
         // Set up min and max dates.
         LocalDate tempDate = LocalDate.now();
 
-        if (!SUtils.parseDate(minDate, tempDate)) {
+        try {
+            tempDate = SUtils.parseDate(minDate);
+        } catch (ParseException e) {
             tempDate = new LocalDate(DEFAULT_START_YEAR, Calendar.JANUARY + 1, 1);
         }
 
         final LocalDate minLocalDate = tempDate;
 
-        if (!SUtils.parseDate(maxDate, tempDate)) {
+        try {
+            tempDate = SUtils.parseDate(maxDate);
+        } catch (ParseException e) {
             tempDate = new LocalDate(DEFAULT_END_YEAR, Calendar.DECEMBER + 1, 31);
         }
 
@@ -315,16 +320,16 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      * @param minDate The minimal supported date.
      */
     public void setMinDate(long minDate) {
-        mTempDate.withFields(new DateTime(minDate).toLocalDate());
+        mTempDate = new DateTime(minDate).toLocalDate();
         if (mTempDate.getYear() == mMinDate.getYear()
                 && mTempDate.getDayOfYear() != mMinDate.getDayOfYear()) {
             return;
         }
         if (mCurrentDate.getStartDate().isBefore(mTempDate)) {
-            mCurrentDate.getStartDate().withFields(mTempDate);
+            mCurrentDate.setStartDate(mTempDate);
             onDateChanged(false, true);
         }
-        mMinDate.withFields(mTempDate);
+        mMinDate = mTempDate;
         mDayPickerView.setMinDate(mMinDate);
     }
 
@@ -349,16 +354,16 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      * @param maxDate The maximal supported date.
      */
     public void setMaxDate(long maxDate) {
-        mTempDate.withFields(new DateTime(maxDate).toLocalDate());
+        mTempDate = new DateTime(maxDate).toLocalDate();
         if (mTempDate.getYear() == mMaxDate.getYear()
                 && mTempDate.getDayOfYear()!= mMaxDate.getDayOfWeek()) {
             return;
         }
         if (mCurrentDate.getEndDate().isAfter(mTempDate)) {
-            mCurrentDate.getEndDate().withFields(mTempDate);
+            mCurrentDate.setEndDate(mTempDate);
             onDateChanged(false, true);
         }
-        mMaxDate.withFields(mTempDate);
+        mMaxDate = mTempDate;
         mDayPickerView.setMaxDate(mMaxDate);
     }
 
@@ -442,8 +447,8 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
         mCurrentDate.setDate(date);
 
-        mMinDate.withFields(new DateTime(ss.getMinDate()).toLocalDate());
-        mMaxDate.withFields(new DateTime(ss.getMaxDate()).toLocalDate());
+        mMinDate = new DateTime(ss.getMinDate()).toLocalDate();
+        mMaxDate = new DateTime(ss.getMaxDate()).toLocalDate();
 
         onCurrentDateChanged(false);
 

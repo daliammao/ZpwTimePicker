@@ -32,27 +32,9 @@ SelectedDate {
         mSecondDate = LocalDate.now();
 
         if (date != null) {
-            mFirstDate.withYear(date.getStartDate().getYear());
-            mFirstDate.withDayOfYear(date.getStartDate().getDayOfYear());
-            mSecondDate.withYear(date.getEndDate().getYear());
-            mSecondDate.withDayOfYear(date.getEndDate().getDayOfYear());
+            mFirstDate = date.getStartDate();
+            mSecondDate = date.getEndDate();
         }
-    }
-
-    public LocalDate getFirstDate() {
-        return mFirstDate;
-    }
-
-    public void setFirstDate(LocalDate firstDate) {
-        mFirstDate = firstDate;
-    }
-
-    public LocalDate getSecondDate() {
-        return mSecondDate;
-    }
-
-    public void setSecondDate(LocalDate secondDate) {
-        mSecondDate = secondDate;
     }
 
     public void setDate(LocalDate date) {
@@ -64,8 +46,24 @@ SelectedDate {
         return compareDates(mFirstDate, mSecondDate) == -1 ? mFirstDate : mSecondDate;
     }
 
+    public void setStartDate(LocalDate startDate) {
+        if (compareDates(mFirstDate, mSecondDate) == -1) {
+            mFirstDate = startDate;
+        } else {
+            mSecondDate = startDate;
+        }
+    }
+
     public LocalDate getEndDate() {
         return compareDates(mFirstDate, mSecondDate) == 1 ? mFirstDate : mSecondDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        if (compareDates(mFirstDate, mSecondDate) == 1) {
+            mFirstDate = endDate;
+        } else {
+            mSecondDate = endDate;
+        }
     }
 
     public Type getType() {
@@ -90,24 +88,24 @@ SelectedDate {
     }
 
     public void set(int field, int value) {
-        switch (field){
+        switch (field) {
             case Calendar.YEAR:
-                mFirstDate.withYear(value);
-                mSecondDate.withYear(value);
+                mFirstDate = mFirstDate.withYear(value);
+                mSecondDate = mSecondDate.withYear(value);
                 break;
             case Calendar.MONTH:
-                mFirstDate.withMonthOfYear(value);
-                mSecondDate.withMonthOfYear(value);
+                mFirstDate = mFirstDate.withMonthOfYear(value);
+                mSecondDate = mSecondDate.withMonthOfYear(value);
                 break;
             case Calendar.DAY_OF_MONTH:
-                mFirstDate.withDayOfMonth(value);
-                mSecondDate.withDayOfMonth(value);
+                mFirstDate = mFirstDate.withDayOfMonth(value);
+                mSecondDate = mSecondDate.withDayOfMonth(value);
                 break;
         }
     }
 
-    public SelectedDateTime toSelectedDateTime(LocalTime firstTime,LocalTime secondTime){
-        return new SelectedDateTime(mFirstDate.toDateTime(firstTime),mSecondDate.toDateTime(secondTime));
+    public SelectedDateTime toSelectedDateTime(LocalTime firstTime, LocalTime secondTime) {
+        return new SelectedDateTime(mFirstDate.toDateTime(firstTime), mSecondDate.toDateTime(secondTime));
     }
 
     @Override

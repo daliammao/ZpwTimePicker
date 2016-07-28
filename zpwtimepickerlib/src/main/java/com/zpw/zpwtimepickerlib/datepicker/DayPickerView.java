@@ -45,8 +45,8 @@ public class DayPickerView extends ViewGroup {
     private static final int[] ATTRS_TEXT_COLOR = new int[]{android.R.attr.textColor};
 
     private SelectedDate mSelectedDay = null;
-    private final LocalDate mMinDate = LocalDate.now();
-    private final LocalDate mMaxDate = LocalDate.now();
+    private LocalDate mMinDate = LocalDate.now();
+    private LocalDate mMaxDate = LocalDate.now();
 
     private final AccessibilityManager mAccessibilityManager;
 
@@ -387,7 +387,7 @@ public class DayPickerView extends ViewGroup {
     }
 
     public void setMinDate(LocalDate date) {
-        mMinDate.withFields(date);
+        mMinDate = date;
         onRangeChanged();
     }
 
@@ -397,7 +397,7 @@ public class DayPickerView extends ViewGroup {
     }
 
     public void setMaxDate(LocalDate date) {
-        mMaxDate.withFields(date);
+        mMaxDate = date;
         onRangeChanged();
     }
 
