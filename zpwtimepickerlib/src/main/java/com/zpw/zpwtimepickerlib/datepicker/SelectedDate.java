@@ -3,10 +3,9 @@ package com.zpw.zpwtimepickerlib.datepicker;
 import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-
-import java.util.Calendar;
 
 /**
  * Created by Admin on 25/02/2016.
@@ -87,21 +86,9 @@ SelectedDate {
         mSecondDate = new DateTime(timeInMillis).toLocalDate();
     }
 
-    public void set(int field, int value) {
-        switch (field) {
-            case Calendar.YEAR:
-                mFirstDate = mFirstDate.withYear(value);
-                mSecondDate = mSecondDate.withYear(value);
-                break;
-            case Calendar.MONTH:
-                mFirstDate = mFirstDate.withMonthOfYear(value);
-                mSecondDate = mSecondDate.withMonthOfYear(value);
-                break;
-            case Calendar.DAY_OF_MONTH:
-                mFirstDate = mFirstDate.withDayOfMonth(value);
-                mSecondDate = mSecondDate.withDayOfMonth(value);
-                break;
-        }
+    public void set(DateTimeFieldType field, int value) {
+        mFirstDate = mFirstDate.withField(field,value);
+        mSecondDate = mSecondDate.withField(field,value);
     }
 
     public SelectedDateTime toSelectedDateTime(LocalTime firstTime, LocalTime secondTime) {

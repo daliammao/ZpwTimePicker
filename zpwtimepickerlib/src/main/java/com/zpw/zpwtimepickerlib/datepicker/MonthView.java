@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2014 The Android Open Source Project
+ * Copyright 2015 Vikram Kakkar
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.zpw.zpwtimepickerlib.datepicker;
 
 import android.annotation.TargetApi;
@@ -11,7 +28,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.BuildConfig;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.support.v4.widget.ExploreByTouchHelper;
@@ -25,11 +41,10 @@ import android.view.ViewConfiguration;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.TextView;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
-
-import org.joda.time.LocalDate;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -38,13 +53,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * @author: zhoupengwei
- * @time: 16/7/21-上午10:05
- * @Email: zhoupengwei@qccr.com
- * @desc: A calendar-like view displaying a specified month and the appropriate selectable day numbers
+ * A calendar-like view displaying a specified month and the appropriate selectable day numbers
  * within the specified month.
  */
-public class MonthView extends View {
+class MonthView extends View {
     private static final String TAG = MonthView.class.getSimpleName();
 
     private static final int DAYS_IN_WEEK = 7;
@@ -114,6 +126,7 @@ public class MonthView extends View {
     /**
      * The day of month for the selected day, or -1 if no day is selected.
      */
+    // private int mActivatedDay = -1;
 
     private final ActivatedDays mActivatedDays = new ActivatedDays();
 
@@ -519,10 +532,13 @@ public class MonthView extends View {
 
         // Text is vertically centered within the row height.
         final float halfLineHeight = (p.ascent() + p.descent()) / 2f;
+        //int rowCenter = headerHeight + rowHeight / 2;
         float rowCenter = headerHeight + rowHeight / 2f;
 
         for (int day = 1, col = findDayOffset(); day <= mDaysInMonth; day++) {
+            //final int colCenter = colWidth * col + colWidth / 2;
             final float colCenter = colWidth * col + colWidth / 2f;
+            //final int colCenterRtl;
             final float colCenterRtl;
             if (SUtils.isLayoutRtlCompat(this)) {
                 colCenterRtl = mPaddedWidth - colCenter;
@@ -931,7 +947,8 @@ public class MonthView extends View {
         }
 
         if (mOnDayClickListener != null) {
-            final LocalDate date = new LocalDate(mYear, mMonth, day);
+            final Calendar date = Calendar.getInstance();
+            date.set(mYear, mMonth, day);
 
             mOnDayClickListener.onDayClick(this, date);
         }
@@ -1043,12 +1060,13 @@ public class MonthView extends View {
         }
     }
 
-    public LocalDate composeDate(int day) {
+    public Calendar composeDate(int day) {
         if (!isValidDayOfMonth(day) || !isDayEnabled(day)) {
             return null;
         }
 
-        final LocalDate date = new LocalDate(mYear, mMonth, day);
+        final Calendar date = Calendar.getInstance();
+        date.set(mYear, mMonth, day);
         return date;
     }
 
@@ -1122,6 +1140,6 @@ public class MonthView extends View {
      * Handles callbacks when the user clicks on a time object.
      */
     public interface OnDayClickListener {
-        void onDayClick(MonthView view, LocalDate day);
+        void onDayClick(MonthView view, Calendar day);
     }
 }

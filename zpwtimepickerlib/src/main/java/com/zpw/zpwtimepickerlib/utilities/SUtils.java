@@ -450,7 +450,7 @@ public class SUtils {
     }
 
     public static int getDaysInMonth(int month, int year) {
-        switch (month-1) {
+        switch (month) {
             case Calendar.JANUARY:
             case Calendar.MARCH:
             case Calendar.MAY:

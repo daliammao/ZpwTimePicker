@@ -55,6 +55,7 @@ import com.zpw.zpwtimepickerlib.utilities.SUtils;
 import com.zpw.zpwtimepickerlib.utilities.TextColorHelper;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -371,12 +372,12 @@ public class DatePicker extends FrameLayout {
             // e.g. Switching from 2012 to 2013 when Feb 29, 2012 is selected -> Feb 28, 2013
             final int day = mCurrentDate.getStartDate().getDayOfMonth();
             final int month = mCurrentDate.getStartDate().getMonthOfYear();
-            final int daysInMonth = SUtils.getDaysInMonth(month, year);
+            final int daysInMonth = SUtils.getDaysInMonth(month-1, year);
             if (day > daysInMonth) {
-                mCurrentDate.set(Calendar.DAY_OF_MONTH, daysInMonth);
+                mCurrentDate.set(DateTimeFieldType.dayOfMonth(), daysInMonth);
             }
 
-            mCurrentDate.set(Calendar.YEAR, year);
+            mCurrentDate.set(DateTimeFieldType.year(), year);
             onDateChanged(true, true, true);
 
             // Automatically switch to day picker.
@@ -549,9 +550,9 @@ public class DatePicker extends FrameLayout {
      */
     @SuppressWarnings("unused")
     public void updateDate(int year, int month, int dayOfMonth) {
-        mCurrentDate.set(Calendar.YEAR, year);
-        mCurrentDate.set(Calendar.MONTH, month);
-        mCurrentDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        mCurrentDate.set(DateTimeFieldType.year(), year);
+        mCurrentDate.set(DateTimeFieldType.monthOfYear(), month);
+        mCurrentDate.set(DateTimeFieldType.dayOfMonth(), dayOfMonth);
 
         onDateChanged(false, true, true);
     }

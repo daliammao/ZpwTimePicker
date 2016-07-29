@@ -29,6 +29,7 @@ import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.LocalDate;
 
 import java.text.ParseException;
@@ -267,9 +268,9 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      */
     public void init(int year, int monthOfYear, int dayOfMonth,
                      RecurrenceEndDatePicker.OnDateSetListener callback) {
-        mCurrentDate.set(Calendar.YEAR, year);
-        mCurrentDate.set(Calendar.MONTH, monthOfYear);
-        mCurrentDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        mCurrentDate.set(DateTimeFieldType.year(), year);
+        mCurrentDate.set(DateTimeFieldType.monthOfYear(), monthOfYear);
+        mCurrentDate.set(DateTimeFieldType.dayOfMonth(), dayOfMonth);
 
         mOnDateSetListener = callback;
 
@@ -285,9 +286,9 @@ public class RecurrenceEndDatePicker extends FrameLayout {
      */
     @SuppressWarnings("unused")
     public void updateDate(int year, int month, int dayOfMonth) {
-        mCurrentDate.set(Calendar.YEAR, year);
-        mCurrentDate.set(Calendar.MONTH, month);
-        mCurrentDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        mCurrentDate.set(DateTimeFieldType.year(), year);
+        mCurrentDate.set(DateTimeFieldType.monthOfYear(), month);
+        mCurrentDate.set(DateTimeFieldType.dayOfMonth(), dayOfMonth);
 
         onDateChanged(false, true);
     }
