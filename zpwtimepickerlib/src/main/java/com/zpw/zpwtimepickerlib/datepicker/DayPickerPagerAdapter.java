@@ -248,11 +248,11 @@ class DayPickerPagerAdapter extends PagerAdapter {
     }
 
     private int getMonthForPosition(int position) {
-        return (position + mMinDate.getMonthOfYear()-1) % MONTHS_IN_YEAR + 1;
+        return (position + mMinDate.getMonthOfYear() - 1) % MONTHS_IN_YEAR + 1;
     }
 
     private int getYearForPosition(int position) {
-        final int yearOffset = (position + mMinDate.getMonthOfYear()) / MONTHS_IN_YEAR;
+        final int yearOffset = (position + mMinDate.getMonthOfYear() - 1) / MONTHS_IN_YEAR;
         return yearOffset + mMinDate.getYear();
     }
 
@@ -335,7 +335,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
         }
 
         // MonthView内部计算使用Calendar,与joda time 月份索引相差1
-        v.setMonthParams(month-1, year, mFirstDayOfWeek,
+        v.setMonthParams(month - 1, year, mFirstDayOfWeek,
                 enabledDayRangeStart, enabledDayRangeEnd, selectedDay[0], selectedDay[1],
                 mSelectedDay != null ? mSelectedDay.getType() : null);
 
@@ -399,10 +399,8 @@ class DayPickerPagerAdapter extends PagerAdapter {
             if (newMonthView != null) {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
                 LocalDate selectedDayStart = new LocalDate(newMonthView.calendar.composeDate(dayOfMonth));
-                if (selectedDayStart != null) {
-                    mTempSelectedDay.setDate(selectedDayStart);
-                    return mTempSelectedDay;
-                }
+                mTempSelectedDay.setDate(selectedDayStart);
+                return mTempSelectedDay;
             }
         }
 
@@ -416,8 +414,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
                 LocalDate selectedDayEnd = new LocalDate(newMonthView.calendar.composeDate(dayOfMonth));
 
-                if (selectedDayEnd != null && (!updateIfNecessary
-                        || !mSelectedDay.getEndDate().isEqual(selectedDayEnd))) {
+                if (!updateIfNecessary || !mSelectedDay.getEndDate().isEqual(selectedDayEnd)) {
                     mTempSelectedDay.setEndDate(selectedDayEnd);
                     return mTempSelectedDay;
                 }
@@ -458,7 +455,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
         float endDateQuan = mSelectedDay.getEndDate().getYear()
                 + mSelectedDay.getEndDate().getMonthOfYear() / 100f;
 
-        float dateQuan = year + (month + 1) / 100f;
+        float dateQuan = year + month / 100f;
 
         if (dateQuan >= startDateQuan && dateQuan <= endDateQuan) {
             int startDay, endDay;
@@ -471,7 +468,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             if (dateQuan == endDateQuan) {
                 endDay = mSelectedDay.getEndDate().getDayOfMonth();
             } else {
-                endDay = SUtils.getDaysInMonth(month-1, year);
+                endDay = SUtils.getDaysInMonth(month - 1, year);
             }
 
             return new int[]{startDay, endDay};
