@@ -19,7 +19,6 @@ package com.zpw.zpwtimepickerlib.datepicker;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
-import android.support.v4.BuildConfig;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -28,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 

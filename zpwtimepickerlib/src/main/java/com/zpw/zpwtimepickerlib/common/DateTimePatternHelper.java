@@ -1,9 +1,9 @@
 package com.zpw.zpwtimepickerlib.common;
 
 import android.support.annotation.NonNull;
-import android.support.v4.BuildConfig;
 import android.util.Log;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.datepicker.DatePicker;
 import com.zpw.zpwtimepickerlib.timepicker.TimePicker;
 

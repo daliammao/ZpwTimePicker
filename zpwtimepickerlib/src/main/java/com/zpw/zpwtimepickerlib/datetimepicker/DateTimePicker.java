@@ -211,7 +211,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         LayoutInflater.from(context).inflate(R.layout.sublime_picker_view_layout,
                 this, true);
 
-        mDefaultDateFormatter = DateTimeFormat.forPattern("YYYY-MM-DD");
+        mDefaultDateFormatter = DateTimeFormat.forPattern("YYYY-MM-dd");
         mDefaultTimeFormatter = DateTimeFormat.forPattern("HH:mm");
 
         llMainContentHolder = (LinearLayout) findViewById(R.id.llMainContentHolder);

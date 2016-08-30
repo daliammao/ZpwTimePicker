@@ -23,7 +23,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.BuildConfig;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.util.SparseArray;
@@ -31,6 +30,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
