@@ -591,6 +591,7 @@ public class DatePicker extends FrameLayout {
         }
 
         switch (mPickerType) {
+            default:
             case SINGLE:
                 switchToSingleDateView();
                 break;
@@ -598,7 +599,6 @@ public class DatePicker extends FrameLayout {
                 switchToDateRangeView();
                 break;
             case BOTH:
-            default:
                 if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
                     switchToSingleDateView();
                 } else if (mCurrentDate.getType() == SelectedDate.Type.RANGE) {
