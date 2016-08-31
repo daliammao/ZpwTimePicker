@@ -39,6 +39,9 @@ import java.util.Locale;
 public class Options implements Parcelable {
     public enum Picker {DATE_PICKER, TIME_PICKER, REPEAT_OPTION_PICKER, INVALID}
 
+    // 日期选择的展现类型
+    public enum DatePickerType{SINGLE,RANGE, BOTH}
+
     // make DatePicker available
     public final static int ACTIVATE_DATE_PICKER = 0x01;
 
@@ -63,11 +66,10 @@ public class Options implements Parcelable {
             = RecurrencePicker.RecurrenceOption.DOES_NOT_REPEAT;
     private String mRecurrenceRule = "";
 
-    // Allow date range selection
-    private boolean mCanPickDateRange;
-
     // Defaults
     private Picker mPickerToShow = Picker.DATE_PICKER;
+
+    private DatePickerType mDatePickerType = DatePickerType.BOTH;
 
     public Options() {
         // Nothing
@@ -374,13 +376,13 @@ public class Options implements Parcelable {
         // TODO: Validation? mMinDate < mMaxDate
     }
 
-    public Options setCanPickDateRange(boolean canPickDateRange) {
-        mCanPickDateRange = canPickDateRange;
+    public Options setDatePickerType(DatePickerType type) {
+        mDatePickerType = type;
         return this;
     }
 
-    public boolean canPickDateRange() {
-        return mCanPickDateRange;
+    public DatePickerType getDatePickerType() {
+        return mDatePickerType;
     }
 
     @Override
@@ -404,7 +406,7 @@ public class Options implements Parcelable {
         mEndMinute = in.readInt();
         mIs24HourView = in.readByte() != 0;
         mRecurrenceRule = in.readString();
-        mCanPickDateRange = in.readByte() != 0;
+        mDatePickerType = DatePickerType.valueOf(in.readString());
     }
 
     @Override
@@ -424,7 +426,7 @@ public class Options implements Parcelable {
         dest.writeInt(mEndMinute);
         dest.writeByte((byte) (mIs24HourView ? 1 : 0));
         dest.writeString(mRecurrenceRule);
-        dest.writeByte((byte) (mCanPickDateRange ? 1 : 0));
+        dest.writeString(mDatePickerType.name());
     }
 
     public static final Creator<Options> CREATOR = new Creator<Options>() {

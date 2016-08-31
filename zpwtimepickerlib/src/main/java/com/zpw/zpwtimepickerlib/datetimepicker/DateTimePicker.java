@@ -523,7 +523,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
         mRecurrencePickerEnabled = mOptions.isRecurrencePickerActive();
 
         if (mDatePickerEnabled) {
-            mDatePicker.init(mOptions.getDateParams(), mOptions.canPickDateRange(), this);
+            mDatePicker.init(mOptions.getDateParams(), mOptions.getDatePickerType(), this);
 
             long[] dateRange = mOptions.getDateRange();
 
@@ -600,7 +600,7 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     @Override
     public void onDateChanged(DatePicker view, SelectedDate selectedDate) {
         // TODO: Consider removing this propagation of date change event altogether
-        mDatePicker.init(selectedDate, mOptions.canPickDateRange(), this);
+        mDatePicker.init(selectedDate, mOptions.getDatePickerType(), this);
     }
 
     @Override

@@ -50,6 +50,7 @@ import android.widget.ViewAnimator;
 import com.zpw.zpwtimepickerlib.BuildConfig;
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
+import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 import com.zpw.zpwtimepickerlib.utilities.TextColorHelper;
@@ -112,6 +113,8 @@ public class DatePicker extends FrameLayout {
     private LocalDate mTempDate;
     private LocalDate mMinDate;
     private LocalDate mMaxDate;
+
+    private Options.DatePickerType mDatePickerType;
 
     private int mFirstDayOfWeek;
 
@@ -372,7 +375,7 @@ public class DatePicker extends FrameLayout {
             // e.g. Switching from 2012 to 2013 when Feb 29, 2012 is selected -> Feb 28, 2013
             final int day = mCurrentDate.getStartDate().getDayOfMonth();
             final int month = mCurrentDate.getStartDate().getMonthOfYear();
-            final int daysInMonth = SUtils.getDaysInMonth(month-1, year);
+            final int daysInMonth = SUtils.getDaysInMonth(month - 1, year);
             if (day > daysInMonth) {
                 mCurrentDate.set(DateTimeFieldType.dayOfMonth(), daysInMonth);
             }
@@ -522,20 +525,18 @@ public class DatePicker extends FrameLayout {
      * Initialize the state. If the provided values designate an inconsistent
      * date the values are normalized before updating the spinners.
      *
-     * @param selectedDate The initial date or date range.
-     * @param canPickRange Enable/disable date range selection
-     * @param callback     How user is notified date is changed by
-     *                     user, can be null.
+     * @param selectedDate   The initial date or date range.
+     * @param datePickerType type of date range selection
+     * @param callback       How user is notified date is changed by
+     *                       user, can be null.
      */
     //public void init(int year, int monthOfYear, int dayOfMonth, boolean canPickRange,
-    public void init(SelectedDate selectedDate, boolean canPickRange,
+    public void init(SelectedDate selectedDate, Options.DatePickerType datePickerType,
                      OnDateChangedListener callback) {
-        //mCurrentDate.set(Calendar.YEAR, year);
-        //mCurrentDate.set(Calendar.MONTH, monthOfYear);
-        //mCurrentDate.set(Calendar.DAY_OF_MONTH, dayOfMonth);
         mCurrentDate = new SelectedDate(selectedDate);
+        mDatePickerType = datePickerType;
 
-        mDayPickerView.setCanPickRange(canPickRange);
+        mDayPickerView.setCanPickRange(datePickerType == Options.DatePickerType.BOTH);
         mDateChangedListener = callback;
 
         onDateChanged(false, false, true);
@@ -589,10 +590,21 @@ public class DatePicker extends FrameLayout {
                     + mCurrentDate.getEndDate().toString());
         }
 
-        if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
-            switchToSingleDateView();
-        } else if (mCurrentDate.getType() == SelectedDate.Type.RANGE) {
-            switchToDateRangeView();
+        switch (mDatePickerType) {
+            case SINGLE:
+                switchToSingleDateView();
+                break;
+            case RANGE:
+                switchToDateRangeView();
+                break;
+            case BOTH:
+            default:
+                if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
+                    switchToSingleDateView();
+                } else if (mCurrentDate.getType() == SelectedDate.Type.RANGE) {
+                    switchToDateRangeView();
+                }
+                break;
         }
     }
 
