@@ -87,6 +87,8 @@ public class Sampler extends AppCompatActivity {
                                             String recurrenceRule) {
 
             mSelectedDateTime = selectedDateTime;
+            mHour = mSelectedDateTime.getStartDateTime().getHourOfDay();
+            mMinute = mSelectedDateTime.getStartDateTime().getMinuteOfHour();
             mRecurrenceOption = recurrenceOption != null ?
                     recurrenceOption.name() : "n/a";
             mRecurrenceRule = recurrenceRule != null ?

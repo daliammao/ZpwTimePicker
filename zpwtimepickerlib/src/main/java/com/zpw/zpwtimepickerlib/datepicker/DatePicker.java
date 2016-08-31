@@ -530,7 +530,6 @@ public class DatePicker extends FrameLayout {
      * @param callback       How user is notified date is changed by
      *                       user, can be null.
      */
-    //public void init(int year, int monthOfYear, int dayOfMonth, boolean canPickRange,
     public void init(SelectedDate selectedDate, Options.PickerType pickerType,
                      OnDateChangedListener callback) {
         mCurrentDate = new SelectedDate(selectedDate);
