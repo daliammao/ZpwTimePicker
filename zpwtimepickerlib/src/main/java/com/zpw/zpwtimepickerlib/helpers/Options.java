@@ -40,7 +40,7 @@ public class Options implements Parcelable {
     public enum Picker {DATE_PICKER, TIME_PICKER, REPEAT_OPTION_PICKER, INVALID}
 
     // 日期选择的展现类型
-    public enum DatePickerType{SINGLE,RANGE, BOTH}
+    public enum PickerType {SINGLE, RANGE, BOTH, INVALID}
 
     // make DatePicker available
     public final static int ACTIVATE_DATE_PICKER = 0x01;
@@ -69,7 +69,8 @@ public class Options implements Parcelable {
     // Defaults
     private Picker mPickerToShow = Picker.DATE_PICKER;
 
-    private DatePickerType mDatePickerType = DatePickerType.BOTH;
+    // 根据mDisplayOptions的值会有不同的效果
+    private PickerType mPickerType = PickerType.SINGLE;
 
     public Options() {
         // Nothing
@@ -330,7 +331,7 @@ public class Options implements Parcelable {
             mEndHour = endDT.getHourOfDay();
             mEndMinute = endDT.getMinuteOfHour();
         } else {
-            endDT = new DateTime(mEndYear, mEndMonth, mEndDayOfMonth,mEndHour,mEndMinute);
+            endDT = new DateTime(mEndYear, mEndMonth, mEndDayOfMonth, mEndHour, mEndMinute);
         }
 
         return new SelectedDateTime(startDT, endDT);
@@ -376,13 +377,50 @@ public class Options implements Parcelable {
         // TODO: Validation? mMinDate < mMaxDate
     }
 
-    public Options setDatePickerType(DatePickerType type) {
-        mDatePickerType = type;
+    public Options setPickerType(PickerType type) {
+        mPickerType = type;
         return this;
     }
 
-    public DatePickerType getDatePickerType() {
-        return mDatePickerType;
+    public PickerType getPickerType() {
+        return mPickerType;
+    }
+
+    public PickerType getPickerTypeForDateTime(){
+        if(isDatePickerActive()&&isTimePickerActive()){
+            if(mPickerType == PickerType.INVALID){
+                return PickerType.SINGLE;
+            }else{
+                return mPickerType;
+            }
+        }else{
+            return PickerType.INVALID;
+        }
+    }
+
+    public PickerType getPickerTypeForDate(){
+        if(isDatePickerActive()){
+            if(mPickerType == PickerType.INVALID){
+                return PickerType.SINGLE;
+            }else{
+                return mPickerType;
+            }
+        }else{
+            return PickerType.INVALID;
+        }
+    }
+
+    public PickerType getPickerTypeForTime(){
+        if(isTimePickerActive()){
+            //如果日期和时间都可以选择,则时间选择只能是SINGLE,不支持不同日期有不同的时间段
+            if(mPickerType == PickerType.INVALID||isDatePickerActive()){
+                return PickerType.SINGLE;
+            }else{
+                return mPickerType;
+            }
+        }else{
+            return PickerType.INVALID;
+        }
     }
 
     @Override
@@ -406,7 +444,7 @@ public class Options implements Parcelable {
         mEndMinute = in.readInt();
         mIs24HourView = in.readByte() != 0;
         mRecurrenceRule = in.readString();
-        mDatePickerType = DatePickerType.valueOf(in.readString());
+        mPickerType = PickerType.valueOf(in.readString());
     }
 
     @Override
@@ -426,7 +464,7 @@ public class Options implements Parcelable {
         dest.writeInt(mEndMinute);
         dest.writeByte((byte) (mIs24HourView ? 1 : 0));
         dest.writeString(mRecurrenceRule);
-        dest.writeString(mDatePickerType.name());
+        dest.writeString(mPickerType.name());
     }
 
     public static final Creator<Options> CREATOR = new Creator<Options>() {

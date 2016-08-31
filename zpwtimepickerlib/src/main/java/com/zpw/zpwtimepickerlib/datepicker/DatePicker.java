@@ -114,7 +114,7 @@ public class DatePicker extends FrameLayout {
     private LocalDate mMinDate;
     private LocalDate mMaxDate;
 
-    private Options.DatePickerType mDatePickerType;
+    private Options.PickerType mPickerType;
 
     private int mFirstDayOfWeek;
 
@@ -526,17 +526,17 @@ public class DatePicker extends FrameLayout {
      * date the values are normalized before updating the spinners.
      *
      * @param selectedDate   The initial date or date range.
-     * @param datePickerType type of date range selection
+     * @param pickerType type of date range selection
      * @param callback       How user is notified date is changed by
      *                       user, can be null.
      */
     //public void init(int year, int monthOfYear, int dayOfMonth, boolean canPickRange,
-    public void init(SelectedDate selectedDate, Options.DatePickerType datePickerType,
+    public void init(SelectedDate selectedDate, Options.PickerType pickerType,
                      OnDateChangedListener callback) {
         mCurrentDate = new SelectedDate(selectedDate);
-        mDatePickerType = datePickerType;
+        mPickerType = pickerType;
 
-        mDayPickerView.setCanPickRange(datePickerType == Options.DatePickerType.BOTH);
+        mDayPickerView.setCanPickRange(pickerType == Options.PickerType.BOTH);
         mDateChangedListener = callback;
 
         onDateChanged(false, false, true);
@@ -590,7 +590,7 @@ public class DatePicker extends FrameLayout {
                     + mCurrentDate.getEndDate().toString());
         }
 
-        switch (mDatePickerType) {
+        switch (mPickerType) {
             case SINGLE:
                 switchToSingleDateView();
                 break;

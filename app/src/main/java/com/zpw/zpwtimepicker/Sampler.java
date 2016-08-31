@@ -321,7 +321,7 @@ public class Sampler extends AppCompatActivity {
         options.setDisplayOptions(displayOptions);
 
         // Enable/disable the date range selection feature
-        options.setDatePickerType(cbAllowDateRangeSelection.isChecked()? Options.DatePickerType.BOTH: Options.DatePickerType.RANGE);
+        options.setPickerType(cbAllowDateRangeSelection.isChecked()? Options.PickerType.BOTH: Options.PickerType.RANGE);
 
         // Example for setting date range:
         // Note that you can pass a date range as the initial date params
