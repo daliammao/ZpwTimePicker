@@ -17,90 +17,195 @@
 
 <!-- This layout is duplicated in land/time_picker_material.xml, so any
      changes made here need to be manually copied over. -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/time_header"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:padding="@dimen/sp_timepicker_separator_padding"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp">
+    android:orientation="horizontal">
 
-    <!-- The hour should always be to the left of the separator,
-         regardless of the current locale's layout direction. -->
-    <TextView
-        android:id="@+id/hours"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/separator"
-        android:layout_alignBaseline="@+id/separator"
-        android:textAppearance="@style/SPTimeLabelTextAppearance"
-        android:singleLine="true"
-        android:ellipsize="none"
-        tools:text="9"/>
+    <RelativeLayout
+        android:id="@+id/rl_header_time_single_cont"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp">
 
-    <TextView
-        android:id="@+id/separator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/sp_timepicker_separator_padding"
-        android:layout_marginRight="@dimen/sp_timepicker_separator_padding"
-        android:layout_centerInParent="true"
-        android:textAppearance="@style/SPTimeLabelTextAppearance"
-        android:importantForAccessibility="no"
-        tools:text=":"/>
+        <!-- The hour should always be to the left of the separator,
+     regardless of the current locale's layout direction. -->
+        <TextView
+            android:id="@+id/hours"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/separator"
+            android:layout_alignBaseline="@+id/separator"
+            android:textAppearance="@style/SPTimeLabelTextAppearance"
+            android:singleLine="true"
+            android:ellipsize="none"
+            tools:text="9"/>
 
-    <!-- The minutes should always be to the left of the separator,
-         regardless of the current locale's layout direction. -->
-    <TextView
-        android:id="@+id/minutes"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/separator"
-        android:layout_alignBaseline="@+id/separator"
-        android:textAppearance="@style/SPTimeLabelTextAppearance"
-        android:singleLine="true"
-        android:ellipsize="none"
-        tools:text="35"/>
+        <TextView
+            android:id="@+id/separator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/sp_timepicker_separator_padding"
+            android:layout_marginRight="@dimen/sp_timepicker_separator_padding"
+            android:layout_centerInParent="true"
+            android:textAppearance="@style/SPTimeLabelTextAppearance"
+            android:importantForAccessibility="no"
+            tools:text=":"/>
 
-    <!-- The layout alignment of this view will switch between toRightOf
-         @id/minutes and toLeftOf @id/hours depending on the locale. -->
+        <!-- The minutes should always be to the left of the separator,
+             regardless of the current locale's layout direction. -->
+        <TextView
+            android:id="@+id/minutes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/separator"
+            android:layout_alignBaseline="@+id/separator"
+            android:textAppearance="@style/SPTimeLabelTextAppearance"
+            android:singleLine="true"
+            android:ellipsize="none"
+            tools:text="35"/>
+
+        <!-- The layout alignment of this view will switch between toRightOf
+             @id/minutes and toLeftOf @id/hours depending on the locale. -->
+        <LinearLayout
+            android:id="@+id/ampm_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/minutes"
+            android:layout_alignBaseline="@+id/minutes"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:orientation="vertical"
+            android:baselineAlignedChildIndex="1">
+            <CheckedTextView
+                android:id="@+id/am_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/sp_timepicker_am_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="AM"/>
+            <CheckedTextView
+                android:id="@+id/pm_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/sp_timepicker_pm_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="PM"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_header_time_range_cont"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingEnd="?attr/dialogPreferredPadding"
+        android:paddingLeft="?attr/dialogPreferredPadding"
+        android:paddingRight="?attr/dialogPreferredPadding"
+        android:paddingStart="?attr/dialogPreferredPadding"
+        android:paddingTop="10dp"
+        android:layout_gravity="center">
+        <LinearLayout
+            android:id="@+id/ampm_layout_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/time_start"
+            android:orientation="horizontal"
+            android:baselineAlignedChildIndex="1">
+            <CheckedTextView
+                android:id="@+id/am_label_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/sp_timepicker_am_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="AM"/>
+            <CheckedTextView
+                android:id="@+id/pm_label_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:paddingTop="@dimen/sp_timepicker_pm_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="PM"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/time_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ampm_layout_start"
+            android:textAppearance="@style/SPTimeRangeLabelTextAppearance"
+            android:singleLine="true"
+            android:ellipsize="none"
+            tools:text="9:35"/>
+
+        <LinearLayout
+            android:id="@+id/ampm_layout_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:orientation="horizontal"
+            android:baselineAlignedChildIndex="1">
+            <CheckedTextView
+                android:id="@+id/am_label_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/sp_timepicker_am_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="AM"/>
+            <CheckedTextView
+                android:id="@+id/pm_label_end"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:paddingTop="@dimen/sp_timepicker_pm_top_padding"
+                android:textAppearance="@style/SPAmPmLabelTextAppearance"
+                android:lines="1"
+                android:ellipsize="none"
+                tools:text="PM"/>
+        </LinearLayout>
+        <TextView
+            android:id="@+id/time_end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/ampm_layout_end"
+            android:textAppearance="@style/SPTimeRangeLabelTextAppearance"
+            android:singleLine="true"
+            android:ellipsize="none"
+            tools:text="9:35"/>
+    </RelativeLayout>
+
     <LinearLayout
-        android:id="@+id/ampm_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/minutes"
-        android:layout_alignBaseline="@+id/minutes"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:orientation="vertical"
-        android:baselineAlignedChildIndex="1">
-        <CheckedTextView
-            android:id="@+id/am_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/sp_timepicker_am_top_padding"
-            android:textAppearance="@style/SPAmPmLabelTextAppearance"
-            android:lines="1"
-            android:ellipsize="none"
-            tools:text="AM"/>
-        <CheckedTextView
-            android:id="@+id/pm_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/sp_timepicker_pm_top_padding"
-            android:textAppearance="@style/SPAmPmLabelTextAppearance"
-            android:lines="1"
-            android:ellipsize="none"
-            tools:text="PM"/>
-    </LinearLayout>
+        android:layout_gravity="top|end"
+        android:layout_marginTop="6dp"
+        android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/ivRecurrenceOptionsTP"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"/>
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/iv_header_date_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="6dp"
+            android:src="@drawable/reset_ff"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/ivRecurrenceOptionsTP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</FrameLayout>

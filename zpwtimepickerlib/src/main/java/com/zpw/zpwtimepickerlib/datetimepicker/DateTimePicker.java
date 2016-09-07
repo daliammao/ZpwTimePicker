@@ -61,8 +61,10 @@ import java.util.Locale;
  * and RecurrencePicker, backported to API 14.
  * You can opt for any combination of these three Pickers.
  */
-public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChangedListener,
+public class DateTimePicker extends FrameLayout implements
+        DatePicker.OnDateChangedListener,
         DatePicker.DatePickerValidationCallback,
+        TimePicker.OnTimeChangedListener,
         TimePicker.TimePickerValidationCallback {
     private static final String TAG = DateTimePicker.class.getSimpleName();
 
@@ -607,6 +609,11 @@ public class DateTimePicker extends FrameLayout implements DatePicker.OnDateChan
     public void onDatePickerValidationChanged(boolean valid) {
         mDatePickerValid = valid;
         reassessValidity();
+    }
+
+    @Override
+    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
+
     }
 
     @Override

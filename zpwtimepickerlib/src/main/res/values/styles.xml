@@ -21,16 +21,19 @@
         <item name="spHeaderBackground">?spHeaderBackgroundPtr</item>
         <item name="spMinDate">01/01/1900</item>
         <item name="spMaxDate">12/31/2100</item>
-        <item name="spHeaderTextColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="spHeaderTextColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
     </style>
 
     <style name="SPDateLabelTextAppearance" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
         <item name="android:textSize">@dimen/sp_date_picker_date_label_size</item>
     </style>
 
     <style name="SPDateRangeLabelTextAppearance" parent="TextAppearance.AppCompat">
-        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
         <item name="android:textSize">@dimen/sp_date_picker_date_range_label_size</item>
     </style>
 
@@ -157,17 +160,27 @@
 
     <style name="SublimeTimePickerStyle">
         <item name="spHeaderBackground">?spHeaderBackgroundPtr</item>
-        <item name="spHeaderTextColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="spHeaderTextColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
     </style>
 
     <style name="SPTimeLabelTextAppearance" parent="TextAppearance.AppCompat">
         <item name="android:textSize">@dimen/sp_timepicker_time_label_size</item>
-        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
+    </style>
+
+
+    <style name="SPTimeRangeLabelTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
+        <item name="android:textSize">@dimen/sp_timepicker_time_range_label_size</item>
     </style>
 
     <style name="SPAmPmLabelTextAppearance" parent="TextAppearance.AppCompat.Button">
         <item name="android:textSize">@dimen/sp_timepicker_ampm_label_size</item>
-        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr</item>
+        <item name="android:textColor">?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr
+        </item>
     </style>
 
     <!-- RadialTimePickerView -->

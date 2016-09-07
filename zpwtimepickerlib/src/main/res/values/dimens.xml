@@ -98,6 +98,7 @@
     <!-- Text size for the time picker header HH:MM label. This value is large
          enough that we don't need to use scaled pixels, dp is fine. -->
     <dimen name="sp_timepicker_time_label_size">60dp</dimen>
+    <dimen name="sp_timepicker_time_range_label_size">40dp</dimen>
     <dimen name="sp_timepicker_ampm_label_size">16dp</dimen>
 
     <dimen name="sp_date_picker_date_range_label_size">18dp</dimen>

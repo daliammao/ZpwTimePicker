@@ -31,14 +31,13 @@ import android.widget.TextView;
 
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
+import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
+import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-
-import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
-import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 /**
  * @author: zhoupengwei
@@ -71,13 +70,26 @@ public class TimePicker extends FrameLayout
     private Locale mCurrentLocale;
 
     private View mHeaderView;
+
+    private RelativeLayout mRlHeaderTimeSingleCont;
     private TextView mHourView;
     private TextView mMinuteView;
     private View mAmPmLayout;
     private CheckedTextView mAmLabel;
     private CheckedTextView mPmLabel;
-    private RadialTimePickerView mRadialTimePickerView;
     private TextView mSeparatorView;
+
+    private RelativeLayout mRlHeaderTimeRangeCont;
+    private TextView mTimeStart;
+    private View mAmPmLayoutStart;
+    private CheckedTextView mAmLabelStart;
+    private CheckedTextView mPmLabelStart;
+    private TextView mTimeEnd;
+    private View mAmPmLayoutEnd;
+    private CheckedTextView mAmLabelEnd;
+    private CheckedTextView mPmLabelEnd;
+
+    private RadialTimePickerView mRadialTimePickerView;
 
     private String mAmText;
     private String mPmText;
@@ -169,6 +181,7 @@ public class TimePicker extends FrameLayout
 
         mHeaderView = mainView.findViewById(R.id.time_header);
 
+        mRlHeaderTimeSingleCont = (RelativeLayout)mainView.findViewById(R.id.rl_header_time_single_cont);
         // Set up hour/minute labels.
         mHourView = (TextView) mainView.findViewById(R.id.hours);
         mHourView.setOnClickListener(mClickListener);
@@ -196,6 +209,27 @@ public class TimePicker extends FrameLayout
         mPmLabel.setText(obtainVerbatim(amPmStrings[1]));
         mPmLabel.setOnClickListener(mClickListener);
 
+        mRlHeaderTimeRangeCont = (RelativeLayout)mainView.findViewById(R.id.rl_header_time_range_cont);
+
+        mTimeStart = (TextView) mainView.findViewById(R.id.time_start);
+        // Set up AM/PM labels.
+        mAmPmLayoutStart = mainView.findViewById(R.id.ampm_layout_start);
+        mAmLabelStart = (CheckedTextView) mAmPmLayoutStart.findViewById(R.id.am_label_start);
+        mAmLabelStart.setText(obtainVerbatim(amPmStrings[0]));
+        mAmLabelStart.setOnClickListener(mClickListener);
+        mPmLabelStart = (CheckedTextView) mAmPmLayoutStart.findViewById(R.id.pm_label_start);
+        mPmLabelStart.setText(obtainVerbatim(amPmStrings[1]));
+        mPmLabelStart.setOnClickListener(mClickListener);
+
+        mTimeEnd = (TextView) mainView.findViewById(R.id.time_end);
+        // Set up AM/PM labels.
+        mAmPmLayoutEnd = mainView.findViewById(R.id.ampm_layout_end);
+        mAmLabelEnd = (CheckedTextView) mAmPmLayoutEnd.findViewById(R.id.am_label_end);
+        mAmLabelEnd.setText(obtainVerbatim(amPmStrings[0]));
+        mAmLabelEnd.setOnClickListener(mClickListener);
+        mPmLabelEnd = (CheckedTextView) mAmPmLayoutEnd.findViewById(R.id.pm_label_end);
+        mPmLabelEnd.setText(obtainVerbatim(amPmStrings[1]));
+        mPmLabelEnd.setOnClickListener(mClickListener);
         ColorStateList headerTextColor = a.getColorStateList(R.styleable.SublimeTimePicker_spHeaderTextColor);
 
         if (headerTextColor != null) {
@@ -204,6 +238,14 @@ public class TimePicker extends FrameLayout
             mMinuteView.setTextColor(headerTextColor);
             mAmLabel.setTextColor(headerTextColor);
             mPmLabel.setTextColor(headerTextColor);
+
+            mTimeStart.setTextColor(headerTextColor);
+            mAmLabelStart.setTextColor(headerTextColor);
+            mPmLabelStart.setTextColor(headerTextColor);
+
+            mTimeEnd.setTextColor(headerTextColor);
+            mAmLabelEnd.setTextColor(headerTextColor);
+            mPmLabelEnd.setTextColor(headerTextColor);
         }
 
         // Set up header background, if available.
@@ -341,42 +383,42 @@ public class TimePicker extends FrameLayout
     }
 
     private void setAmPmAtStart(boolean isAmPmAtStart) {
-        if (mIsAmPmAtStart != isAmPmAtStart) {
-            mIsAmPmAtStart = isAmPmAtStart;
-
-            final RelativeLayout.LayoutParams params =
-                    (RelativeLayout.LayoutParams) mAmPmLayout.getLayoutParams();
-            int[] rules = params.getRules();
-
-            if (rules[RelativeLayout.RIGHT_OF] != 0 ||
-                    rules[RelativeLayout.LEFT_OF] != 0) {
-                if (isAmPmAtStart) {
-                    params.addRule(RelativeLayout.RIGHT_OF, 0);
-                    params.addRule(RelativeLayout.LEFT_OF, mHourView.getId());
-                } else {
-                    params.addRule(RelativeLayout.LEFT_OF, 0);
-                    params.addRule(RelativeLayout.RIGHT_OF, mMinuteView.getId());
-                }
-            }
-
-            mAmPmLayout.setLayoutParams(params);
-        }
+//        if (mIsAmPmAtStart != isAmPmAtStart) {
+//            mIsAmPmAtStart = isAmPmAtStart;
+//
+//            final RelativeLayout.LayoutParams params =
+//                    (RelativeLayout.LayoutParams) mAmPmLayout.getLayoutParams();
+//            int[] rules = params.getRules();
+//
+//            if (rules[RelativeLayout.RIGHT_OF] != 0 ||
+//                    rules[RelativeLayout.LEFT_OF] != 0) {
+//                if (isAmPmAtStart) {
+//                    params.addRule(RelativeLayout.RIGHT_OF, 0);
+//                    params.addRule(RelativeLayout.LEFT_OF, mHourView.getId());
+//                } else {
+//                    params.addRule(RelativeLayout.LEFT_OF, 0);
+//                    params.addRule(RelativeLayout.RIGHT_OF, mMinuteView.getId());
+//                }
+//            }
+//
+//            mAmPmLayout.setLayoutParams(params);
+//        }
     }
 
     /**
      * Set the current hour.
      */
     public void setCurrentHour(int currentHour) {
-        if (mInitialHourOfDay == currentHour) {
-            return;
-        }
-        mInitialHourOfDay = currentHour;
-        updateHeaderHour(currentHour, true);
-        updateHeaderAmPm();
-        mRadialTimePickerView.setCurrentHour(currentHour);
-        mRadialTimePickerView.setAmOrPm(mInitialHourOfDay < 12 ? AM : PM);
-        invalidate();
-        onTimeChanged();
+//        if (mInitialHourOfDay == currentHour) {
+//            return;
+//        }
+//        mInitialHourOfDay = currentHour;
+//        updateHeaderHour(currentHour, true);
+//        updateHeaderAmPm();
+//        mRadialTimePickerView.setCurrentHour(currentHour);
+//        mRadialTimePickerView.setAmOrPm(mInitialHourOfDay < 12 ? AM : PM);
+//        invalidate();
+//        onTimeChanged();
     }
 
     /**
@@ -401,14 +443,14 @@ public class TimePicker extends FrameLayout
      * Set the current minute (0-59).
      */
     public void setCurrentMinute(int currentMinute) {
-        if (mInitialMinute == currentMinute) {
-            return;
-        }
-        mInitialMinute = currentMinute;
-        updateHeaderMinute(currentMinute, true);
-        mRadialTimePickerView.setCurrentMinute(currentMinute);
-        invalidate();
-        onTimeChanged();
+//        if (mInitialMinute == currentMinute) {
+//            return;
+//        }
+//        mInitialMinute = currentMinute;
+//        updateHeaderMinute(currentMinute, true);
+//        mRadialTimePickerView.setCurrentMinute(currentMinute);
+//        invalidate();
+//        onTimeChanged();
     }
 
     /**
@@ -652,13 +694,13 @@ public class TimePicker extends FrameLayout
     }
 
     private void updateAmPmLabelStates(int amOrPm) {
-        final boolean isAm = amOrPm == AM;
-        mAmLabel.setActivated(isAm);
-        mAmLabel.setChecked(isAm);
-
-        final boolean isPm = amOrPm == PM;
-        mPmLabel.setActivated(isPm);
-        mPmLabel.setChecked(isPm);
+//        final boolean isAm = amOrPm == AM;
+//        mAmLabel.setActivated(isAm);
+//        mAmLabel.setChecked(isAm);
+//
+//        final boolean isPm = amOrPm == PM;
+//        mPmLabel.setActivated(isPm);
+//        mPmLabel.setChecked(isPm);
     }
 
     /**
@@ -697,52 +739,52 @@ public class TimePicker extends FrameLayout
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void updateHeaderHour(int value, boolean announce) {
-        String timePattern;
-
-        if (SUtils.isApi_18_OrHigher()) {
-            timePattern = DateFormat.getBestDateTimePattern(mCurrentLocale,
-                    (mIs24HourView) ? "Hm" : "hm");
-        } else {
-            timePattern = DateTimePatternHelper.getBestDateTimePattern(mCurrentLocale,
-                    (mIs24HourView) ? DateTimePatternHelper.PATTERN_Hm
-                            : DateTimePatternHelper.PATTERN_hm);
-        }
-
-        final int lengthPattern = timePattern.length();
-        boolean hourWithTwoDigit = false;
-        char hourFormat = '\0';
-        // Check if the returned pattern is single or double 'H', 'h', 'K', 'k'. We also save
-        // the hour format that we found.
-        for (int i = 0; i < lengthPattern; i++) {
-            final char c = timePattern.charAt(i);
-            if (c == 'H' || c == 'h' || c == 'K' || c == 'k') {
-                hourFormat = c;
-                if (i + 1 < lengthPattern && c == timePattern.charAt(i + 1)) {
-                    hourWithTwoDigit = true;
-                }
-                break;
-            }
-        }
-        final String format;
-        if (hourWithTwoDigit) {
-            format = "%02d";
-        } else {
-            format = "%d";
-        }
-        if (mIs24HourView) {
-            // 'k' means 1-24 hour
-            if (hourFormat == 'k' && value == 0) {
-                value = 24;
-            }
-        } else {
-            // 'K' means 0-11 hour
-            value = modulo12(value, hourFormat == 'K');
-        }
-        CharSequence text = String.format(format, value);
-        mHourView.setText(text);
-        if (announce) {
-            tryAnnounceForAccessibility(text, true);
-        }
+//        String timePattern;
+//
+//        if (SUtils.isApi_18_OrHigher()) {
+//            timePattern = DateFormat.getBestDateTimePattern(mCurrentLocale,
+//                    (mIs24HourView) ? "Hm" : "hm");
+//        } else {
+//            timePattern = DateTimePatternHelper.getBestDateTimePattern(mCurrentLocale,
+//                    (mIs24HourView) ? DateTimePatternHelper.PATTERN_Hm
+//                            : DateTimePatternHelper.PATTERN_hm);
+//        }
+//
+//        final int lengthPattern = timePattern.length();
+//        boolean hourWithTwoDigit = false;
+//        char hourFormat = '\0';
+//        // Check if the returned pattern is single or double 'H', 'h', 'K', 'k'. We also save
+//        // the hour format that we found.
+//        for (int i = 0; i < lengthPattern; i++) {
+//            final char c = timePattern.charAt(i);
+//            if (c == 'H' || c == 'h' || c == 'K' || c == 'k') {
+//                hourFormat = c;
+//                if (i + 1 < lengthPattern && c == timePattern.charAt(i + 1)) {
+//                    hourWithTwoDigit = true;
+//                }
+//                break;
+//            }
+//        }
+//        final String format;
+//        if (hourWithTwoDigit) {
+//            format = "%02d";
+//        } else {
+//            format = "%d";
+//        }
+//        if (mIs24HourView) {
+//            // 'k' means 1-24 hour
+//            if (hourFormat == 'k' && value == 0) {
+//                value = 24;
+//            }
+//        } else {
+//            // 'K' means 0-11 hour
+//            value = modulo12(value, hourFormat == 'K');
+//        }
+//        CharSequence text = String.format(format, value);
+//        mHourView.setText(text);
+//        if (announce) {
+//            tryAnnounceForAccessibility(text, true);
+//        }
     }
 
     private void tryAnnounceForAccessibility(CharSequence text, boolean isHour) {
@@ -812,14 +854,14 @@ public class TimePicker extends FrameLayout
     }
 
     private void updateHeaderMinute(int value, boolean announceForAccessibility) {
-        if (value == 60) {
-            value = 0;
-        }
-        final CharSequence text = String.format(mCurrentLocale, "%02d", value);
-        mMinuteView.setText(text);
-        if (announceForAccessibility) {
-            tryAnnounceForAccessibility(text, false);
-        }
+//        if (value == 60) {
+//            value = 0;
+//        }
+//        final CharSequence text = String.format(mCurrentLocale, "%02d", value);
+//        mMinuteView.setText(text);
+//        if (announceForAccessibility) {
+//            tryAnnounceForAccessibility(text, false);
+//        }
     }
 
     /**
