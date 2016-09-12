@@ -64,8 +64,6 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
     private Locale mCurrentLocale;
 
-    private DatePickerValidationCallback mValidationCallback;
-
     private DecisionButtonLayout mDecisionButtonLayout;
 
     private DecisionButtonLayout.Callback mDecisionButtonLayoutCallback = new DecisionButtonLayout.Callback() {
@@ -473,19 +471,6 @@ public class RecurrenceEndDatePicker extends FrameLayout {
 
     public CharSequence getAccessibilityClassName() {
         return DatePicker.class.getName();
-    }
-
-    public void setValidationCallback(DatePickerValidationCallback callback) {
-        mValidationCallback = callback;
-    }
-
-    @SuppressWarnings("unused")
-    protected void onValidationChanged(boolean valid) {
-        if (mValidationCallback != null) {
-            mValidationCallback.onDatePickerValidationChanged(valid);
-        }
-
-        mDecisionButtonLayout.updateValidity(valid);
     }
 
     /**

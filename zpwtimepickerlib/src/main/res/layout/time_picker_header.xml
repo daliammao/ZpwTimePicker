@@ -195,7 +195,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/iv_header_date_reset"
+            android:id="@+id/iv_header_time_reset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="6dp"

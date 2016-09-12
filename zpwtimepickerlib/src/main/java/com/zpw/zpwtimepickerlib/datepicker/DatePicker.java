@@ -120,8 +120,6 @@ public class DatePicker extends FrameLayout {
 
     private Locale mCurrentLocale;
 
-    private DatePickerValidationCallback mValidationCallback;
-
     private int mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_NONE;
 
     private boolean mIsInLandscapeMode;
@@ -820,25 +818,6 @@ public class DatePicker extends FrameLayout {
 
     public CharSequence getAccessibilityClassName() {
         return DatePicker.class.getName();
-    }
-
-    public void setValidationCallback(DatePickerValidationCallback callback) {
-        mValidationCallback = callback;
-    }
-
-    @SuppressWarnings("unused")
-    protected void onValidationChanged(boolean valid) {
-        if (mValidationCallback != null) {
-            mValidationCallback.onDatePickerValidationChanged(valid);
-        }
-    }
-
-    /**
-     * A callback interface for updating input validity when the date picker
-     * when included into a dialog.
-     */
-    public interface DatePickerValidationCallback {
-        void onDatePickerValidationChanged(boolean valid);
     }
 
     /**
