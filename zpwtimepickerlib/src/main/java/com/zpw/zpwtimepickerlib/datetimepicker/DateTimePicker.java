@@ -42,6 +42,7 @@ import com.zpw.zpwtimepickerlib.drawables.OverflowDrawable;
 import com.zpw.zpwtimepickerlib.helpers.ListenerAdapter;
 import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
+import com.zpw.zpwtimepickerlib.timepicker.SelectedTime;
 import com.zpw.zpwtimepickerlib.timepicker.TimePicker;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
@@ -63,9 +64,7 @@ import java.util.Locale;
  */
 public class DateTimePicker extends FrameLayout implements
         DatePicker.OnDateChangedListener,
-        DatePicker.DatePickerValidationCallback,
-        TimePicker.OnTimeChangedListener,
-        TimePicker.TimePickerValidationCallback {
+        TimePicker.OnTimeChangedListener {
     private static final String TAG = DateTimePicker.class.getSimpleName();
 
     // Container for 'SublimeDatePicker' & 'SublimeTimePicker'
@@ -287,7 +286,7 @@ public class DateTimePicker extends FrameLayout implements
             llMainContentHolder.setVisibility(View.VISIBLE);
 
             if (mButtonLayout.isSwitcherButtonEnabled()) {
-                LocalTime toFormat = new LocalTime(mTimePicker.getCurrentHour(),mTimePicker.getCurrentMinute());
+                LocalTime toFormat = new LocalTime(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
 
                 switchButtonText = mListener.formatTime(toFormat);
 
@@ -537,8 +536,6 @@ public class DateTimePicker extends FrameLayout implements
                 mDatePicker.setMaxDate(dateRange[1]);
             }
 
-            mDatePicker.setValidationCallback(this);
-
             ivRecurrenceOptionsDP.setVisibility(mRecurrencePickerEnabled ?
                     View.VISIBLE : View.GONE);
         } else {
@@ -551,7 +548,6 @@ public class DateTimePicker extends FrameLayout implements
             mTimePicker.setCurrentHour(timeParams[0] /* hour of day */);
             mTimePicker.setCurrentMinute(timeParams[1] /* minute */);
             mTimePicker.setIs24HourView(mOptions.is24HourView());
-            mTimePicker.setValidationCallback(this);
 
             ivRecurrenceOptionsTP.setVisibility(mRecurrencePickerEnabled ?
                     View.VISIBLE : View.GONE);
@@ -606,19 +602,7 @@ public class DateTimePicker extends FrameLayout implements
     }
 
     @Override
-    public void onDatePickerValidationChanged(boolean valid) {
-        mDatePickerValid = valid;
-        reassessValidity();
-    }
+    public void onTimeChanged(TimePicker view, SelectedTime selectedTime) {
 
-    @Override
-    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-
-    }
-
-    @Override
-    public void onTimePickerValidationChanged(boolean valid) {
-        mTimePickerValid = valid;
-        reassessValidity();
     }
 }

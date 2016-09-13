@@ -93,6 +93,14 @@ public class SelectedTime {
         mSecondTime = mSecondTime.withField(field, value);
     }
 
+    public void setStart(DateTimeFieldType field, int value){
+        setStartTime(getStartTime().withField(field, value));
+    }
+
+    public void setEnd(DateTimeFieldType field, int value){
+        setEndTime(getEndTime().withField(field, value));
+    }
+
     public SelectedDateTime toSelectedDateTime(LocalDate firstDate, LocalDate secondDate) {
         return new SelectedDateTime(firstDate.toDateTime(mFirstTime), secondDate.toDateTime(mSecondTime));
     }

@@ -114,7 +114,7 @@ public class DatePicker extends FrameLayout {
     private LocalDate mMinDate;
     private LocalDate mMaxDate;
 
-    private Options.PickerType mPickerType;
+    private Options.PickerType mPickerType = Options.PickerType.SINGLE;
 
     private int mFirstDayOfWeek;
 
@@ -767,7 +767,7 @@ public class DatePicker extends FrameLayout {
 
         return new SavedState(superState, mCurrentDate, mMinDate.toDate().getTime(),
                 mMaxDate.toDate().getTime(), mCurrentView, listPosition,
-                listPositionOffset, mCurrentlyActivatedRangeItem);
+                listPositionOffset, mCurrentlyActivatedRangeItem,mPickerType);
     }
 
     @SuppressLint("NewApi")
@@ -788,6 +788,7 @@ public class DatePicker extends FrameLayout {
         mMaxDate = new DateTime(ss.getMaxDate()).toLocalDate();
 
         mCurrentlyActivatedRangeItem = ss.getCurrentlyActivatedRangeItem();
+        mPickerType = ss.getPickerType();
 
         onCurrentDateChanged(false);
         setCurrentView(currentView);
@@ -837,13 +838,15 @@ public class DatePicker extends FrameLayout {
         private final int mListPosition;
         private final int mListPositionOffset;
         private final int ssCurrentlyActivatedRangeItem;
+        private final Options.PickerType mPickerType;
 
         /**
          * Constructor called from {@link DatePicker#onSaveInstanceState()}
          */
         private SavedState(Parcelable superState, SelectedDate selectedDate,
                            long minDate, long maxDate, int currentView, int listPosition,
-                           int listPositionOffset, int currentlyActivatedRangeItem) {
+                           int listPositionOffset, int currentlyActivatedRangeItem,
+                           Options.PickerType pickerType) {
             super(superState);
             mSelectedYearStart = selectedDate.getStartDate().getYear();
             mSelectedMonthStart = selectedDate.getStartDate().getMonthOfYear();
@@ -857,6 +860,7 @@ public class DatePicker extends FrameLayout {
             mListPosition = listPosition;
             mListPositionOffset = listPositionOffset;
             ssCurrentlyActivatedRangeItem = currentlyActivatedRangeItem;
+            mPickerType = pickerType;
         }
 
         /**
@@ -876,6 +880,7 @@ public class DatePicker extends FrameLayout {
             mListPosition = in.readInt();
             mListPositionOffset = in.readInt();
             ssCurrentlyActivatedRangeItem = in.readInt();
+            mPickerType = Options.PickerType.valueOf(in.readString());
         }
 
         @Override
@@ -893,6 +898,7 @@ public class DatePicker extends FrameLayout {
             dest.writeInt(mListPosition);
             dest.writeInt(mListPositionOffset);
             dest.writeInt(ssCurrentlyActivatedRangeItem);
+            dest.writeString(mPickerType.name());
         }
 
         public int getSelectedDayStart() {
@@ -941,6 +947,10 @@ public class DatePicker extends FrameLayout {
 
         public int getCurrentlyActivatedRangeItem() {
             return ssCurrentlyActivatedRangeItem;
+        }
+
+        public Options.PickerType getPickerType() {
+            return mPickerType;
         }
 
         @SuppressWarnings("all")

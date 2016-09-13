@@ -21,14 +21,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/time_header"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal">
 
     <RelativeLayout
         android:id="@+id/rl_header_time_single_cont"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="10dp">
+        android:layout_height="wrap_content"
+        android:paddingBottom="18dp"
+        android:layout_gravity="center">
 
         <!-- The hour should always be to the left of the separator,
      regardless of the current locale's layout direction. -->
@@ -49,7 +50,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/sp_timepicker_separator_padding"
             android:layout_marginRight="@dimen/sp_timepicker_separator_padding"
-            android:layout_centerInParent="true"
+            android:layout_centerHorizontal="true"
             android:textAppearance="@style/SPTimeLabelTextAppearance"
             android:importantForAccessibility="no"
             tools:text=":"/>
@@ -103,13 +104,14 @@
     <RelativeLayout
         android:id="@+id/rl_header_time_range_cont"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:paddingEnd="?attr/dialogPreferredPadding"
         android:paddingLeft="?attr/dialogPreferredPadding"
         android:paddingRight="?attr/dialogPreferredPadding"
         android:paddingStart="?attr/dialogPreferredPadding"
-        android:paddingTop="10dp"
-        android:layout_gravity="center">
+        android:paddingBottom="10dp"
+        android:layout_marginTop="45dp"
+        android:layout_gravity="center|bottom">
         <LinearLayout
             android:id="@+id/ampm_layout_start"
             android:layout_width="wrap_content"

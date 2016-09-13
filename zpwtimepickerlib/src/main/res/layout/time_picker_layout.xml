@@ -25,7 +25,7 @@
     <include
         layout="@layout/time_picker_header"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/sp_timepicker_header_height"
+        android:layout_height="wrap_content"
         android:layout_gravity="center" />
 
     <com.zpw.zpwtimepickerlib.timepicker.RadialTimePickerView

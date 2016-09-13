@@ -13,14 +13,10 @@ import android.support.v4.view.AccessibilityDelegateCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.text.style.TtsSpan;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
@@ -32,15 +28,14 @@ import android.widget.TextView;
 
 import com.zpw.zpwtimepickerlib.R;
 import com.zpw.zpwtimepickerlib.common.DateTimePatternHelper;
+import com.zpw.zpwtimepickerlib.helpers.Options;
 import com.zpw.zpwtimepickerlib.utilities.AccessibilityUtils;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
-import org.joda.time.Chronology;
+import org.joda.time.DateTimeFieldType;
 import org.joda.time.LocalTime;
-import org.joda.time.chrono.GJChronology;
 
 import java.text.DateFormatSymbols;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -95,9 +90,6 @@ public class TimePicker extends FrameLayout {
 
     private RadialTimePickerView mRadialTimePickerView;
 
-    private String mAmText;
-    private String mPmText;
-
     private boolean mIsEnabled = true;
     private boolean mAllowAutoAdvance;
     private SelectedTime mCurrentTime;
@@ -107,6 +99,8 @@ public class TimePicker extends FrameLayout {
     // Accessibility strings.
     private String mSelectHours;
     private String mSelectMinutes;
+
+    private Options.PickerType mPickerType = Options.PickerType.SINGLE;
 
     // Most recent time announcement values for accessibility.
     private CharSequence mLastAnnouncedText;
@@ -158,18 +152,6 @@ public class TimePicker extends FrameLayout {
         DateFormatSymbols dfs = DateFormatSymbols.getInstance(mCurrentLocale);
         String[] amPmStrings = dfs.getAmPmStrings();/*{"AM", "PM"}*/
 
-        if (amPmStrings.length == 2
-                && !TextUtils.isEmpty(amPmStrings[0]) && !TextUtils.isEmpty(amPmStrings[1])) {
-            mAmText = amPmStrings[0].length() > 2 ?
-                    amPmStrings[0].substring(0, 2) : amPmStrings[0];
-            mPmText = amPmStrings[1].length() > 2 ?
-                    amPmStrings[1].substring(0, 2) : amPmStrings[1];
-        } else {
-            // Defaults
-            mAmText = "AM";
-            mPmText = "PM";
-        }
-
         final int layoutResourceId = R.layout.time_picker_layout;
         final View mainView = inflater.inflate(layoutResourceId, this);
 
@@ -177,7 +159,7 @@ public class TimePicker extends FrameLayout {
 
         ivHeaderTimeReset = (ImageView) mainView.findViewById(R.id.iv_header_time_reset);
 
-        mRlHeaderTimeSingleCont = (RelativeLayout)mainView.findViewById(R.id.rl_header_time_single_cont);
+        mRlHeaderTimeSingleCont = (RelativeLayout) mainView.findViewById(R.id.rl_header_time_single_cont);
         // Set up hour/minute labels.
         mHourView = (TextView) mainView.findViewById(R.id.hours);
         mHourView.setOnClickListener(mClickListener);
@@ -205,7 +187,7 @@ public class TimePicker extends FrameLayout {
         mPmLabel.setText(obtainVerbatim(amPmStrings[1]));
         mPmLabel.setOnClickListener(mClickListener);
 
-        mRlHeaderTimeRangeCont = (RelativeLayout)mainView.findViewById(R.id.rl_header_time_range_cont);
+        mRlHeaderTimeRangeCont = (RelativeLayout) mainView.findViewById(R.id.rl_header_time_range_cont);
 
         mTimeStart = (TextView) mainView.findViewById(R.id.time_start);
         // Set up AM/PM labels.
@@ -279,11 +261,11 @@ public class TimePicker extends FrameLayout {
         final Calendar calendar = Calendar.getInstance(mCurrentLocale);
         mCurrentTime = new SelectedTime(LocalTime.fromCalendarFields(calendar));
         mIs24HourView = false;
-        init(mCurrentTime /* 12h */, HOUR_INDEX);
+        init(mCurrentTime /* 12h */, Options.PickerType.RANGE, HOUR_INDEX);
     }
 
     RadialTimePickerView.OnValueSelectedListener mOnValueSelectedListener
-            = new RadialTimePickerView.OnValueSelectedListener(){
+            = new RadialTimePickerView.OnValueSelectedListener() {
         /**
          * Called by the picker for updating the header display.
          */
@@ -291,33 +273,55 @@ public class TimePicker extends FrameLayout {
         public void onValueSelected(int pickerIndex, int newValue, boolean autoAdvance) {
             switch (pickerIndex) {
                 case HOUR_INDEX:
-                    if (mAllowAutoAdvance && autoAdvance) {
-                        updateHeaderHour(newValue, false);
+                    boolean announce = mAllowAutoAdvance && autoAdvance;
+
+                    switch (mCurrentlyActivatedRangeItem) {
+                        case RANGE_ACTIVATED_NONE:
+                            mCurrentTime.set(DateTimeFieldType.hourOfDay(), newValue);
+                            break;
+                        case RANGE_ACTIVATED_START:
+                            mCurrentTime.setStart(DateTimeFieldType.hourOfDay(), newValue);
+                            break;
+                        case RANGE_ACTIVATED_END:
+                            mCurrentTime.setEnd(DateTimeFieldType.hourOfDay(), newValue);
+                            break;
+                    }
+
+                    updateHeaderHour(mCurrentTime, !announce);
+                    if (announce) {
                         setCurrentItemShowing(MINUTE_INDEX, true, false);
                         AccessibilityUtils.makeAnnouncement(TimePicker.this, newValue + ". " + mSelectMinutes);
-                    } else {
-                        updateHeaderHour(newValue, true);
                     }
                     break;
                 case MINUTE_INDEX:
-                    updateHeaderMinute(newValue, true);
+                    switch (mCurrentlyActivatedRangeItem) {
+                        case RANGE_ACTIVATED_NONE:
+                            mCurrentTime.set(DateTimeFieldType.minuteOfHour(), newValue);
+                            break;
+                        case RANGE_ACTIVATED_START:
+                            mCurrentTime.setStart(DateTimeFieldType.minuteOfHour(), newValue);
+                            break;
+                        case RANGE_ACTIVATED_END:
+                            mCurrentTime.setEnd(DateTimeFieldType.minuteOfHour(), newValue);
+                            break;
+                    }
+                    updateHeaderMinute(mCurrentTime, true);
                     break;
             }
 
             if (mOnTimeChangedListener != null) {
-                mOnTimeChangedListener.onTimeChanged(TimePicker.this, getCurrentHour(), getCurrentMinute());
+                mOnTimeChangedListener.onTimeChanged(TimePicker.this, getCurrentTime());
             }
         }
     };
-
 
     private final OnClickListener mClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             if (v.getId() == R.id.am_label) {
-                setAmOrPm(AM);
+                setAmOrPm(RANGE_ACTIVATED_NONE, AM);
             } else if (v.getId() == R.id.pm_label) {
-                setAmOrPm(PM);
+                setAmOrPm(RANGE_ACTIVATED_NONE, PM);
             } else if (v.getId() == R.id.hours) {
                 setCurrentItemShowing(HOUR_INDEX, true, true);
             } else if (v.getId() == R.id.minutes) {
@@ -372,8 +376,9 @@ public class TimePicker extends FrameLayout {
         return maxWidth;
     }
 
-    public void init(SelectedTime selectedTime, int index) {
+    public void init(SelectedTime selectedTime, Options.PickerType pickerType, int index) {
         mCurrentTime = selectedTime;
+        mPickerType = pickerType;
         updateUI(index);
     }
 
@@ -384,6 +389,24 @@ public class TimePicker extends FrameLayout {
     }
 
     private void updateUI(int index) {
+
+        switch (mPickerType) {
+            case RANGE:
+                switchToDateRangeView();
+                break;
+            case BOTH:
+                if (mCurrentTime.getType() == SelectedTime.Type.SINGLE) {
+                    switchToSingleDateView();
+                } else if (mCurrentTime.getType() == SelectedTime.Type.RANGE) {
+                    switchToDateRangeView();
+                }
+                break;
+            case SINGLE:
+            default:
+                switchToSingleDateView();
+                break;
+        }
+
         // Update RadialPicker values
         updateRadialPicker(index);
         // Enable or disable the AM/PM view.
@@ -420,13 +443,32 @@ public class TimePicker extends FrameLayout {
     }
 
     private void updateRadialPicker(int index) {
-        mRadialTimePickerView.initialize(mInitialHourOfDay, mInitialMinute, mIs24HourView);
+        int hourOfDay, minute;
+        switch (mCurrentlyActivatedRangeItem) {
+            case RANGE_ACTIVATED_START:
+                hourOfDay = mCurrentTime.getStartTime().getHourOfDay();
+                minute = mCurrentTime.getStartTime().getMinuteOfHour();
+                break;
+            case RANGE_ACTIVATED_END:
+                hourOfDay = mCurrentTime.getEndTime().getHourOfDay();
+                minute = mCurrentTime.getEndTime().getMinuteOfHour();
+                break;
+            case RANGE_ACTIVATED_NONE:
+                hourOfDay = mCurrentTime.getStartTime().getHourOfDay();
+                minute = mCurrentTime.getStartTime().getMinuteOfHour();
+                break;
+            default:
+                return;
+        }
+        mRadialTimePickerView.initialize(hourOfDay, minute, mIs24HourView);
         setCurrentItemShowing(index, false, true);
     }
 
     private void updateHeaderAmPm() {
         if (mIs24HourView) {
             mAmPmLayout.setVisibility(View.GONE);
+            mAmPmLayoutStart.setVisibility(View.GONE);
+            mAmPmLayoutEnd.setVisibility(View.GONE);
         } else {
             // Ensure that AM/PM layout is in the correct position.
             String timePattern;
@@ -442,7 +484,11 @@ public class TimePicker extends FrameLayout {
             final boolean isAmPmAtStart = timePattern.startsWith("a");
             setAmPmAtStart(isAmPmAtStart);
 
-            updateAmPmLabelStates(mInitialHourOfDay < 12 ? AM : PM);
+            int hourStart = mCurrentTime.getStartTime().getHourOfDay();
+            int hourEnd = mCurrentTime.getEndTime().getHourOfDay();
+            updateAmPmLabelStates(RANGE_ACTIVATED_NONE, hourStart < 12 ? AM : PM);
+            updateAmPmLabelStates(RANGE_ACTIVATED_START, hourStart < 12 ? AM : PM);
+            updateAmPmLabelStates(RANGE_ACTIVATED_END, hourEnd < 12 ? AM : PM);
         }
     }
 
@@ -473,14 +519,33 @@ public class TimePicker extends FrameLayout {
      * Set the current hour.
      */
     public void setCurrentHour(int currentHour) {
-        if (mInitialHourOfDay == currentHour) {
-            return;
+        switch (mCurrentlyActivatedRangeItem) {
+            case RANGE_ACTIVATED_START:
+                if (mCurrentTime.getStartTime().getHourOfDay() == currentHour) {
+                    return;
+                }
+                mCurrentTime.setStart(DateTimeFieldType.hourOfDay(), currentHour);
+                break;
+            case RANGE_ACTIVATED_END:
+                if (mCurrentTime.getEndTime().getHourOfDay() == currentHour) {
+                    return;
+                }
+                mCurrentTime.setEnd(DateTimeFieldType.hourOfDay(), currentHour);
+                break;
+            case RANGE_ACTIVATED_NONE:
+                if (mCurrentTime.getStartTime().getHourOfDay() == currentHour) {
+                    return;
+                }
+                mCurrentTime.set(DateTimeFieldType.hourOfDay(), currentHour);
+                break;
+            default:
+                return;
         }
-        mInitialHourOfDay = currentHour;
-        updateHeaderHour(currentHour, true);
+
+        updateHeaderHour(mCurrentTime, true);
         updateHeaderAmPm();
         mRadialTimePickerView.setCurrentHour(currentHour);
-        mRadialTimePickerView.setAmOrPm(mInitialHourOfDay < 12 ? AM : PM);
+        mRadialTimePickerView.setAmOrPm(currentHour < 12 ? AM : PM);
         invalidate();
         onTimeChanged();
     }
@@ -507,11 +572,30 @@ public class TimePicker extends FrameLayout {
      * Set the current minute (0-59).
      */
     public void setCurrentMinute(int currentMinute) {
-        if (mInitialMinute == currentMinute) {
-            return;
+        switch (mCurrentlyActivatedRangeItem) {
+            case RANGE_ACTIVATED_START:
+                if (mCurrentTime.getStartTime().getMinuteOfHour() == currentMinute) {
+                    return;
+                }
+                mCurrentTime.setStart(DateTimeFieldType.minuteOfHour(), currentMinute);
+                break;
+            case RANGE_ACTIVATED_END:
+                if (mCurrentTime.getEndTime().getMinuteOfHour() == currentMinute) {
+                    return;
+                }
+                mCurrentTime.setEnd(DateTimeFieldType.minuteOfHour(), currentMinute);
+                break;
+            case RANGE_ACTIVATED_NONE:
+                if (mCurrentTime.getStartTime().getMinuteOfHour() == currentMinute) {
+                    return;
+                }
+                mCurrentTime.set(DateTimeFieldType.minuteOfHour(), currentMinute);
+                break;
+            default:
+                return;
         }
-        mInitialMinute = currentMinute;
-        updateHeaderMinute(currentMinute, true);
+
+        updateHeaderMinute(mCurrentTime, true);
         mRadialTimePickerView.setCurrentMinute(currentMinute);
         invalidate();
         onTimeChanged();
@@ -522,6 +606,10 @@ public class TimePicker extends FrameLayout {
      */
     public int getCurrentMinute() {
         return mRadialTimePickerView.getCurrentMinute();
+    }
+
+    public SelectedTime getCurrentTime() {
+        return mCurrentTime;
     }
 
     /**
@@ -535,8 +623,22 @@ public class TimePicker extends FrameLayout {
         }
         mIs24HourView = is24HourView;
         int hour = mRadialTimePickerView.getCurrentHour();
-        mInitialHourOfDay = hour;
-        updateHeaderHour(hour, false);
+
+        switch (mCurrentlyActivatedRangeItem) {
+            case RANGE_ACTIVATED_START:
+                mCurrentTime.setStart(DateTimeFieldType.hourOfDay(), hour);
+                break;
+            case RANGE_ACTIVATED_END:
+                mCurrentTime.setEnd(DateTimeFieldType.hourOfDay(), hour);
+                break;
+            case RANGE_ACTIVATED_NONE:
+                mCurrentTime.set(DateTimeFieldType.hourOfDay(), hour);
+                break;
+            default:
+                return;
+        }
+
+        updateHeaderHour(mCurrentTime, false);
         updateHeaderAmPm();
         updateRadialPicker(mRadialTimePickerView.getCurrentItemShowing());
         invalidate();
@@ -582,8 +684,8 @@ public class TimePicker extends FrameLayout {
 
     @Override
     public Parcelable onSaveInstanceState() {
-        return new SavedState(super.onSaveInstanceState(), getCurrentHour(), getCurrentMinute(),
-                is24HourView(), getCurrentItemShowing(),mCurrentlyActivatedRangeItem);
+        return new SavedState(super.onSaveInstanceState(), getCurrentTime(),
+                is24HourView(), getCurrentItemShowing(), mCurrentlyActivatedRangeItem, mPickerType);
     }
 
     @Override
@@ -591,9 +693,9 @@ public class TimePicker extends FrameLayout {
         BaseSavedState bss = (BaseSavedState) state;
         super.onRestoreInstanceState(bss.getSuperState());
         SavedState ss = (SavedState) bss;
-        setInKbMode(ss.inKbMode());
-        setTypedTimes(ss.getTypesTimes());
-        init(ss.getHour(), ss.getMinute(), ss.is24HourMode(), ss.getCurrentItemShowing());
+        init(ss.getSelectedTime(), ss.getPickerType(), ss.getCurrentItemShowing());
+        mIs24HourView = ss.is24HourMode();
+        mCurrentlyActivatedRangeItem = ss.getActivatedRangeItem();
         mRadialTimePickerView.invalidate();
     }
 
@@ -638,8 +740,7 @@ public class TimePicker extends FrameLayout {
     private void onTimeChanged() {
         sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
         if (mOnTimeChangedListener != null) {
-            mOnTimeChangedListener.onTimeChanged(this,
-                    getCurrentHour(), getCurrentMinute());
+            mOnTimeChangedListener.onTimeChanged(this, getCurrentTime());
         }
     }
 
@@ -648,38 +749,37 @@ public class TimePicker extends FrameLayout {
      */
     private static class SavedState extends BaseSavedState {
 
-        private final int mHour;
-        private final int mMinute;
+        private final SelectedTime mSelectedTime;
         private final boolean mIs24HourMode;
         private final int mCurrentItemShowing;
         private final int mActivatedRangeItem;
+        private final Options.PickerType mPickerType;
 
-        private SavedState(Parcelable superState, int hour, int minute, boolean is24HourMode,
-                           int currentItemShowing ,int activatedRangeItem) {
+        private SavedState(Parcelable superState, SelectedTime selectedTime, boolean is24HourMode,
+                           int currentItemShowing, int activatedRangeItem,
+                           Options.PickerType pickerType) {
             super(superState);
-            mHour = hour;
-            mMinute = minute;
+            mSelectedTime = selectedTime;
             mIs24HourMode = is24HourMode;
             mCurrentItemShowing = currentItemShowing;
             mActivatedRangeItem = activatedRangeItem;
+            mPickerType = pickerType;
         }
 
         private SavedState(Parcel in) {
             super(in);
-            mHour = in.readInt();
-            mMinute = in.readInt();
+            LocalTime start = LocalTime.fromMillisOfDay(in.readInt());
+            LocalTime end = LocalTime.fromMillisOfDay(in.readInt());
+            mSelectedTime = new SelectedTime(start, end);
             mIs24HourMode = (in.readInt() == 1);
             //noinspection unchecked
             mCurrentItemShowing = in.readInt();
             mActivatedRangeItem = in.readInt();
+            mPickerType = Options.PickerType.valueOf(in.readString());
         }
 
-        public int getHour() {
-            return mHour;
-        }
-
-        public int getMinute() {
-            return mMinute;
+        public SelectedTime getSelectedTime() {
+            return mSelectedTime;
         }
 
         public boolean is24HourMode() {
@@ -694,14 +794,19 @@ public class TimePicker extends FrameLayout {
             return mActivatedRangeItem;
         }
 
+        public Options.PickerType getPickerType() {
+            return mPickerType;
+        }
+
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             super.writeToParcel(dest, flags);
-            dest.writeInt(mHour);
-            dest.writeInt(mMinute);
+            dest.writeInt(mSelectedTime.getStartTime().getMillisOfDay());
+            dest.writeInt(mSelectedTime.getEndTime().getMillisOfDay());
             dest.writeInt(mIs24HourMode ? 1 : 0);
             dest.writeInt(mCurrentItemShowing);
             dest.writeInt(mActivatedRangeItem);
+            dest.writeString(mPickerType.name());
         }
 
         @SuppressWarnings({"unused", "hiding"})
@@ -716,18 +821,54 @@ public class TimePicker extends FrameLayout {
         };
     }
 
-    private void updateAmPmLabelStates(int amOrPm) {
+    private void updateAmPmLabelStates(int rangeItem, int amOrPm) {
         final boolean isAm = amOrPm == AM;
-        mAmLabel.setActivated(isAm);
-        mAmLabel.setChecked(isAm);
-
         final boolean isPm = amOrPm == PM;
-        mPmLabel.setActivated(isPm);
-        mPmLabel.setChecked(isPm);
+
+        switch (rangeItem) {
+            case RANGE_ACTIVATED_START:
+                mAmLabelEnd.setActivated(isAm);
+                mAmLabelEnd.setChecked(isAm);
+
+                mPmLabelEnd.setActivated(isPm);
+                mPmLabelEnd.setChecked(isPm);
+                break;
+            case RANGE_ACTIVATED_END:
+                mAmLabelStart.setActivated(isAm);
+                mAmLabelStart.setChecked(isAm);
+
+                mPmLabelStart.setActivated(isPm);
+                mPmLabelStart.setChecked(isPm);
+                break;
+            case RANGE_ACTIVATED_NONE:
+                mAmLabel.setActivated(isAm);
+                mAmLabel.setChecked(isAm);
+
+                mPmLabel.setActivated(isPm);
+                mPmLabel.setChecked(isPm);
+                break;
+        }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void updateHeaderHour(int value, boolean announce) {
+    private void updateHeaderHour(SelectedTime selectedTime, boolean announce) {
+        String text = hourModuloFormat(selectedTime.getStartTime().getHourOfDay()).toString();
+        mHourView.setText(text);
+        upDateHeaderTimeRange();
+        if (announce) {
+            tryAnnounceForAccessibility(text, true);
+        }
+    }
+
+    private void tryAnnounceForAccessibility(CharSequence text, boolean isHour) {
+        if (mLastAnnouncedIsHour != isHour || !text.equals(mLastAnnouncedText)) {
+            // TODO: Find a better solution, potentially live regions?
+            AccessibilityUtils.makeAnnouncement(this, text);
+            mLastAnnouncedText = text;
+            mLastAnnouncedIsHour = isHour;
+        }
+    }
+
+    private CharSequence hourModuloFormat(int hourValue) {
         String timePattern;
 
         if (SUtils.isApi_18_OrHigher()) {
@@ -754,35 +895,24 @@ public class TimePicker extends FrameLayout {
                 break;
             }
         }
+
         final String format;
         if (hourWithTwoDigit) {
             format = "%02d";
         } else {
             format = "%d";
         }
+
         if (mIs24HourView) {
             // 'k' means 1-24 hour
-            if (hourFormat == 'k' && value == 0) {
-                value = 24;
-            }
+            hourValue = modulo24(hourValue, hourFormat != 'k');
+
         } else {
             // 'K' means 0-11 hour
-            value = modulo12(value, hourFormat == 'K');
+            hourValue = modulo12(hourValue, hourFormat == 'K');
         }
-        CharSequence text = String.format(format, value);
-        mHourView.setText(text);
-        if (announce) {
-            tryAnnounceForAccessibility(text, true);
-        }
-    }
 
-    private void tryAnnounceForAccessibility(CharSequence text, boolean isHour) {
-        if (mLastAnnouncedIsHour != isHour || !text.equals(mLastAnnouncedText)) {
-            // TODO: Find a better solution, potentially live regions?
-            AccessibilityUtils.makeAnnouncement(this, text);
-            mLastAnnouncedText = text;
-            mLastAnnouncedIsHour = isHour;
-        }
+        return String.format(format, hourValue);
     }
 
     private static int modulo12(int n, boolean startWithZero) {
@@ -793,11 +923,22 @@ public class TimePicker extends FrameLayout {
         return value;
     }
 
+    private static int modulo24(int n, boolean startWithZero) {
+        int value = n % 24;
+        // 'k' means 1-24 hour
+        if (value == 0 && !startWithZero) {
+            return 24;
+        }
+        return value;
+    }
+
+    private String mSeparatorText = ":";
+
     /**
      * The time separator is defined in the Unicode CLDR and cannot be supposed to be ":".
-     * <p/>
+     * <p>
      * See http://unicode.org/cldr/trac/browser/trunk/common/main
-     * <p/>
+     * <p>
      * We pass the correct "skeleton" depending on 12 or 24 hours view and then extract the
      * separator as the character which is just after the hour marker in the returned pattern.
      */
@@ -814,17 +955,16 @@ public class TimePicker extends FrameLayout {
                             : DateTimePatternHelper.PATTERN_hm);
         }
 
-        final String separatorText;
         // See http://www.unicode.org/reports/tr35/tr35-dates.html for hour formats
         final char[] hourFormats = {'H', 'h', 'K', 'k'};
         int hIndex = lastIndexOfAny(timePattern, hourFormats);
         if (hIndex == -1) {
             // Default case
-            separatorText = ":";
+            mSeparatorText = ":";
         } else {
-            separatorText = Character.toString(timePattern.charAt(hIndex + 1));
+            mSeparatorText = Character.toString(timePattern.charAt(hIndex + 1));
         }
-        mSeparatorView.setText(separatorText);
+        mSeparatorView.setText(mSeparatorText);
     }
 
     static private int lastIndexOfAny(String str, char[] any) {
@@ -842,15 +982,35 @@ public class TimePicker extends FrameLayout {
         return -1;
     }
 
-    private void updateHeaderMinute(int value, boolean announceForAccessibility) {
-        if (value == 60) {
-            value = 0;
-        }
-        final CharSequence text = String.format(mCurrentLocale, "%02d", value);
+    private void updateHeaderMinute(SelectedTime selectedTime, boolean announceForAccessibility) {
+        int startValue = selectedTime.getStartTime().getMinuteOfHour();
+        final CharSequence text = String.format("%02d", startValue);
         mMinuteView.setText(text);
+        upDateHeaderTimeRange();
         if (announceForAccessibility) {
             tryAnnounceForAccessibility(text, false);
         }
+    }
+
+    private void upDateHeaderTimeRange() {
+        String timeFormat = new StringBuilder()
+                .append("%s")
+                .append(mSeparatorText)
+                .append("%02d")
+                .toString();
+
+        LocalTime startTime = mCurrentTime.getStartTime();
+        LocalTime endTime = mCurrentTime.getEndTime();
+
+        final CharSequence startText = String.format(timeFormat,
+                hourModuloFormat(startTime.getHourOfDay()),
+                startTime.getMinuteOfHour());
+        mTimeStart.setText(startText);
+
+        final CharSequence endText = String.format(timeFormat,
+                hourModuloFormat(endTime.getHourOfDay()),
+                endTime.getMinuteOfHour());
+        mTimeEnd.setText(endText);
     }
 
     /**
@@ -873,8 +1033,8 @@ public class TimePicker extends FrameLayout {
         mMinuteView.setActivated(index == MINUTE_INDEX);
     }
 
-    private void setAmOrPm(int amOrPm) {
-        updateAmPmLabelStates(amOrPm);
+    private void setAmOrPm(int rangeItem, int amOrPm) {
+        updateAmPmLabelStates(rangeItem, amOrPm);
         mRadialTimePickerView.setAmOrPm(amOrPm);
     }
 
@@ -893,17 +1053,9 @@ public class TimePicker extends FrameLayout {
     public interface OnTimeChangedListener {
 
         /**
-         * @param view      The view associated with this listener.
+         * @param view         The view associated with this listener.
          * @param selectedTime The current hour.
          */
         void onTimeChanged(TimePicker view, SelectedTime selectedTime);
-    }
-
-    /**
-     * A callback interface for updating input validity when the TimePicker
-     * when included into a Dialog.
-     */
-    public interface TimePickerValidationCallback {
-        void onTimePickerValidationChanged(boolean valid);
     }
 }
