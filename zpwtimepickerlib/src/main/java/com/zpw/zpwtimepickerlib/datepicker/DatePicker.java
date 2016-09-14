@@ -491,10 +491,21 @@ public class DatePicker extends FrameLayout {
             case VIEW_MONTH_DAY:
                 mDayPickerView.setDate(mCurrentDate);
 
-                if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
-                    switchToSingleDateView();
-                } else if (mCurrentDate.getType() == SelectedDate.Type.RANGE) {
-                    switchToDateRangeView();
+                switch (mPickerType) {
+                    default:
+                    case SINGLE:
+                        switchToSingleDateView();
+                        break;
+                    case RANGE:
+                        switchToDateRangeView();
+                        break;
+                    case BOTH:
+                        if (mCurrentDate.getType() == SelectedDate.Type.SINGLE) {
+                            switchToSingleDateView();
+                        } else if (mCurrentDate.getType() == SelectedDate.Type.RANGE) {
+                            switchToDateRangeView();
+                        }
+                        break;
                 }
 
                 if (mCurrentView != viewIndex) {
