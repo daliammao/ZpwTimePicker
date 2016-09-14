@@ -65,6 +65,8 @@ public class ButtonHandler implements View.OnClickListener {
 
         mSwitcherButtonDP = (Button) sublimeMaterialPicker.findViewById(R.id.buttonSwitcherDP);
         mSwitcherButtonTP = (Button) sublimeMaterialPicker.findViewById(R.id.buttonSwitcherTP);
+        mSwitcherButtonDP.setActivated(true);
+        mSwitcherButtonTP.setActivated(true);
 
         Button bPositiveDP = (Button) sublimeMaterialPicker.findViewById(R.id.buttonPositiveDP);
         Button bPositiveTP = (Button) sublimeMaterialPicker.findViewById(R.id.buttonPositiveTP);

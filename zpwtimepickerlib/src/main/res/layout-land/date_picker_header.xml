@@ -116,6 +116,7 @@
     <Button
         android:id="@+id/buttonSwitcherDP"
         style="?attr/spLandscapeButtonModeSwitcherButtonStyle"
+        android:textColor="?attr/spPrimaryTextSecondaryWhenActivatedMaterialInversePtr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal|bottom"

@@ -76,7 +76,7 @@ public class TimePicker extends FrameLayout {
     private CheckedTextView mPmLabel;
     private TextView mSeparatorView;
 
-    private RelativeLayout mRlHeaderTimeRangeCont;
+    private View mRlHeaderTimeRangeCont;
     private TextView mTimeStart;
     private View mAmPmLayoutStart;
     private CheckedTextView mAmLabelStart;
@@ -187,7 +187,7 @@ public class TimePicker extends FrameLayout {
         mPmLabel.setText(obtainVerbatim(amPmStrings[1]));
         mPmLabel.setOnClickListener(mClickListener);
 
-        mRlHeaderTimeRangeCont = (RelativeLayout) mainView.findViewById(R.id.rl_header_time_range_cont);
+        mRlHeaderTimeRangeCont = mainView.findViewById(R.id.rl_header_time_range_cont);
 
         mTimeStart = (TextView) mainView.findViewById(R.id.time_start);
         // Set up AM/PM labels.
