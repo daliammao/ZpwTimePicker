@@ -319,7 +319,7 @@ public class Sampler extends AppCompatActivity {
         } else if (rbRecurrencePicker.getVisibility() == View.VISIBLE && rbRecurrencePicker.isChecked()) {
             options.setPickerToShow(Options.Picker.REPEAT_OPTION_PICKER);
         }
-
+//        options.setTimeParams(-1,-1,true);
         options.setDisplayOptions(displayOptions);
 
         // Enable/disable the date range selection feature

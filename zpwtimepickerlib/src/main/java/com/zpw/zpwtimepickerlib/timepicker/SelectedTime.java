@@ -48,6 +48,11 @@ public class SelectedTime {
     }
 
     public void setStartTime(LocalTime startTime) {
+        if(compareTimes(startTime, getEndTime()) == 1){
+            setTime(startTime);
+            return;
+        }
+
         if (compareTimes(mFirstTime, mSecondTime) == -1) {
             mFirstTime = startTime;
         } else {
@@ -60,6 +65,11 @@ public class SelectedTime {
     }
 
     public void setEndTime(LocalTime endTime) {
+        if(compareTimes(getStartTime(), endTime) == 1){
+            setTime(endTime);
+            return;
+        }
+
         if (compareTimes(mFirstTime, mSecondTime) == 1) {
             mFirstTime = endTime;
         } else {

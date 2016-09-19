@@ -45,24 +45,8 @@ public class SelectedDateTime {
         return compareDates(mFirstDateTime, mSecondDateTime) == -1 ? mFirstDateTime : mSecondDateTime;
     }
 
-    public void setStartDateTime(DateTime startDateTime) {
-        if (compareDates(mFirstDateTime, mSecondDateTime) == -1) {
-            mFirstDateTime = startDateTime;
-        } else {
-            mSecondDateTime = startDateTime;
-        }
-    }
-
     public DateTime getEndDateTime() {
         return compareDates(mFirstDateTime, mSecondDateTime) == 1 ? mFirstDateTime : mSecondDateTime;
-    }
-
-    public void setEndDateTime(DateTime endDateTime) {
-        if (compareDates(mFirstDateTime, mSecondDateTime) == 1) {
-            mFirstDateTime = endDateTime;
-        } else {
-            mSecondDateTime = endDateTime;
-        }
     }
 
     public Type getType() {

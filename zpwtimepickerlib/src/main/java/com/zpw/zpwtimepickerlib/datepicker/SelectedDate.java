@@ -46,6 +46,11 @@ SelectedDate {
     }
 
     public void setStartDate(LocalDate startDate) {
+        if(compareDates(startDate, getEndDate()) == 1){
+            setDate(startDate);
+            return;
+        }
+
         if (compareDates(mFirstDate, mSecondDate) == -1) {
             mFirstDate = startDate;
         } else {
@@ -58,6 +63,11 @@ SelectedDate {
     }
 
     public void setEndDate(LocalDate endDate) {
+        if(compareDates(getStartDate(), endDate) == 1){
+            setDate(endDate);
+            return;
+        }
+
         if (compareDates(mFirstDate, mSecondDate) == 1) {
             mFirstDate = endDate;
         } else {

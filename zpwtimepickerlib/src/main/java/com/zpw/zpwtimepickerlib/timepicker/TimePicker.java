@@ -190,6 +190,7 @@ public class TimePicker extends FrameLayout {
         mRlHeaderTimeRangeCont = mainView.findViewById(R.id.rl_header_time_range_cont);
 
         mTimeStart = (TextView) mainView.findViewById(R.id.time_start);
+        mTimeStart.setOnClickListener(mClickListener);
         // Set up AM/PM labels.
         mAmPmLayoutStart = mainView.findViewById(R.id.ampm_layout_start);
         mAmLabelStart = (CheckedTextView) mAmPmLayoutStart.findViewById(R.id.am_label_start);
@@ -200,6 +201,7 @@ public class TimePicker extends FrameLayout {
         mPmLabelStart.setOnClickListener(mClickListener);
 
         mTimeEnd = (TextView) mainView.findViewById(R.id.time_end);
+        mTimeEnd.setOnClickListener(mClickListener);
         // Set up AM/PM labels.
         mAmPmLayoutEnd = mainView.findViewById(R.id.ampm_layout_end);
         mAmLabelEnd = (CheckedTextView) mAmPmLayoutEnd.findViewById(R.id.am_label_end);
@@ -309,6 +311,10 @@ public class TimePicker extends FrameLayout {
                     break;
             }
 
+            if(mCurrentlyActivatedRangeItem != RANGE_ACTIVATED_NONE){
+                updateHeaderAmPm();
+            }
+
             if (mOnTimeChangedListener != null) {
                 mOnTimeChangedListener.onTimeChanged(TimePicker.this, getCurrentTime());
             }
@@ -318,14 +324,49 @@ public class TimePicker extends FrameLayout {
     private final OnClickListener mClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (v.getId() == R.id.am_label) {
+            int vId = v.getId();
+            if (vId == R.id.am_label) {
                 setAmOrPm(RANGE_ACTIVATED_NONE, AM);
-            } else if (v.getId() == R.id.pm_label) {
+            } else if (vId == R.id.pm_label) {
                 setAmOrPm(RANGE_ACTIVATED_NONE, PM);
-            } else if (v.getId() == R.id.hours) {
+            } else if (vId == R.id.hours) {
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-            } else if (v.getId() == R.id.minutes) {
+            } else if (vId == R.id.minutes) {
                 setCurrentItemShowing(MINUTE_INDEX, true, true);
+            } else if (vId == R.id.am_label_start) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                setAmOrPm(mCurrentlyActivatedRangeItem, AM);
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(true);
+                mTimeEnd.setActivated(false);
+            } else if (vId == R.id.pm_label_start) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                setAmOrPm(mCurrentlyActivatedRangeItem, PM);
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(true);
+                mTimeEnd.setActivated(false);
+            } else if (vId == R.id.time_start) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(true);
+                mTimeEnd.setActivated(false);
+            } else if (vId == R.id.am_label_end) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                setAmOrPm(mCurrentlyActivatedRangeItem, AM);
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(false);
+                mTimeEnd.setActivated(true);
+            } else if (vId == R.id.pm_label_end) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                setAmOrPm(mCurrentlyActivatedRangeItem, PM);
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(false);
+                mTimeEnd.setActivated(true);
+            } else if (vId == R.id.time_end) {
+                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                setCurrentItemShowing(HOUR_INDEX, true, true);
+                mTimeStart.setActivated(false);
+                mTimeEnd.setActivated(true);
             } else {
                 // Failed to handle this click, don't vibrate.
                 return;
@@ -826,14 +867,14 @@ public class TimePicker extends FrameLayout {
         final boolean isPm = amOrPm == PM;
 
         switch (rangeItem) {
-            case RANGE_ACTIVATED_START:
+            case RANGE_ACTIVATED_END:
                 mAmLabelEnd.setActivated(isAm);
                 mAmLabelEnd.setChecked(isAm);
 
                 mPmLabelEnd.setActivated(isPm);
                 mPmLabelEnd.setChecked(isPm);
                 break;
-            case RANGE_ACTIVATED_END:
+            case RANGE_ACTIVATED_START:
                 mAmLabelStart.setActivated(isAm);
                 mAmLabelStart.setChecked(isAm);
 

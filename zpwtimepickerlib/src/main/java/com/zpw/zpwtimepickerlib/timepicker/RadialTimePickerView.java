@@ -50,13 +50,12 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
 import com.zpw.zpwtimepickerlib.R;
+import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
-
-import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 /**
  * 一个圆形时钟的时间选择器
@@ -571,9 +570,22 @@ public class RadialTimePickerView extends View {
     }
 
     public void setAmOrPm(int val) {
-        mAmOrPm = (val % 2);
+        setAmOrPm(val, true);
+    }
+
+    private void setAmOrPm(int val, boolean callback) {
+        int tempAmOrPm = (val % 2);
+        if (mAmOrPm == tempAmOrPm) {
+            return;
+        }
+
+        mAmOrPm = tempAmOrPm;
         invalidate();
         mTouchHelper.invalidateRoot();
+
+        if (callback && mListener != null) {
+            mListener.onValueSelected(HOURS, getCurrentHour(), false);
+        }
     }
 
     public int getAmOrPm() {
