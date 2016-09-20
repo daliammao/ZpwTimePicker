@@ -273,10 +273,11 @@ public class TimePicker extends FrameLayout {
          */
         @Override
         public void onValueSelected(int pickerIndex, int newValue, boolean autoAdvance) {
+
+            boolean announce = mAllowAutoAdvance && autoAdvance;
+
             switch (pickerIndex) {
                 case HOUR_INDEX:
-                    boolean announce = mAllowAutoAdvance && autoAdvance;
-
                     switch (mCurrentlyActivatedRangeItem) {
                         case RANGE_ACTIVATED_NONE:
                             mCurrentTime.set(DateTimeFieldType.hourOfDay(), newValue);
@@ -308,10 +309,14 @@ public class TimePicker extends FrameLayout {
                             break;
                     }
                     updateHeaderMinute(mCurrentTime, true);
+                    if (announce && mCurrentlyActivatedRangeItem == RANGE_ACTIVATED_START) {
+                        switchToEndWhenRange();
+                        setCurrentItemShowing(HOUR_INDEX, true, true);
+                    }
                     break;
             }
 
-            if(mCurrentlyActivatedRangeItem != RANGE_ACTIVATED_NONE){
+            if (mCurrentlyActivatedRangeItem != RANGE_ACTIVATED_NONE) {
                 updateHeaderAmPm();
             }
 
@@ -334,39 +339,27 @@ public class TimePicker extends FrameLayout {
             } else if (vId == R.id.minutes) {
                 setCurrentItemShowing(MINUTE_INDEX, true, true);
             } else if (vId == R.id.am_label_start) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                switchToStartWhenRange();
                 setAmOrPm(mCurrentlyActivatedRangeItem, AM);
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(true);
-                mTimeEnd.setActivated(false);
             } else if (vId == R.id.pm_label_start) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                switchToStartWhenRange();
                 setAmOrPm(mCurrentlyActivatedRangeItem, PM);
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(true);
-                mTimeEnd.setActivated(false);
             } else if (vId == R.id.time_start) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+                switchToStartWhenRange();
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(true);
-                mTimeEnd.setActivated(false);
             } else if (vId == R.id.am_label_end) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                switchToEndWhenRange();
                 setAmOrPm(mCurrentlyActivatedRangeItem, AM);
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(false);
-                mTimeEnd.setActivated(true);
             } else if (vId == R.id.pm_label_end) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                switchToEndWhenRange();
                 setAmOrPm(mCurrentlyActivatedRangeItem, PM);
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(false);
-                mTimeEnd.setActivated(true);
             } else if (vId == R.id.time_end) {
-                mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+                switchToEndWhenRange();
                 setCurrentItemShowing(HOUR_INDEX, true, true);
-                mTimeStart.setActivated(false);
-                mTimeEnd.setActivated(true);
             } else {
                 // Failed to handle this click, don't vibrate.
                 return;
@@ -481,6 +474,18 @@ public class TimePicker extends FrameLayout {
 
         mTimeStart.setActivated(mCurrentlyActivatedRangeItem == RANGE_ACTIVATED_START);
         mTimeEnd.setActivated(mCurrentlyActivatedRangeItem == RANGE_ACTIVATED_END);
+    }
+
+    private void switchToStartWhenRange() {
+        mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
+        mTimeStart.setActivated(true);
+        mTimeEnd.setActivated(false);
+    }
+
+    private void switchToEndWhenRange() {
+        mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
+        mTimeStart.setActivated(false);
+        mTimeEnd.setActivated(true);
     }
 
     private void updateRadialPicker(int index) {
@@ -977,9 +982,9 @@ public class TimePicker extends FrameLayout {
 
     /**
      * The time separator is defined in the Unicode CLDR and cannot be supposed to be ":".
-     * <p>
+     * <p/>
      * See http://unicode.org/cldr/trac/browser/trunk/common/main
-     * <p>
+     * <p/>
      * We pass the correct "skeleton" depending on 12 or 24 hours view and then extract the
      * separator as the character which is just after the hour marker in the returned pattern.
      */

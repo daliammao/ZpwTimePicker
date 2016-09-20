@@ -544,9 +544,7 @@ public class DateTimePicker extends FrameLayout implements
         }
 
         if (mTimePickerEnabled) {
-            int[] timeParams = mOptions.getTimeParams();
-            mTimePicker.setCurrentHour(timeParams[0] /* hour of day */);
-            mTimePicker.setCurrentMinute(timeParams[1] /* minute */);
+            mTimePicker.init(mOptions.getTimeParams(), mOptions.getPickerTypeForTime(), TimePicker.HOUR_INDEX);
             mTimePicker.setIs24HourView(mOptions.is24HourView());
 
             ivRecurrenceOptionsTP.setVisibility(mRecurrencePickerEnabled ?

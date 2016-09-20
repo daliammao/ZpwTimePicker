@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import com.zpw.zpwtimepickerlib.datepicker.SelectedDate;
 import com.zpw.zpwtimepickerlib.datetimepicker.SelectedDateTime;
 import com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker;
+import com.zpw.zpwtimepickerlib.timepicker.SelectedTime;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
 import org.joda.time.DateTime;
@@ -311,6 +312,26 @@ public class Options implements Parcelable {
         return new SelectedDate(startCal, endCal);
     }
 
+    public SelectedTime getTimeParams(){
+        LocalTime startLt = LocalTime.now();
+        if(mStartHour == -1 || mStartMinute == -1){
+            mStartHour = startLt.getHourOfDay();
+            mStartMinute = startLt.getMinuteOfHour();
+        }else{
+            startLt = new LocalTime(mStartHour,mStartMinute);
+        }
+
+        LocalTime endLt = LocalTime.now();
+        if(mEndHour == -1 || mEndMinute == -1){
+            mEndHour = endLt.getHourOfDay();
+            mEndMinute = endLt.getMinuteOfHour();
+        }else{
+            endLt = new LocalTime(mEndHour,mEndMinute);
+        }
+
+        return new SelectedTime(startLt, endLt);
+    }
+
     public SelectedDateTime getDateTimeParams() {
         DateTime startDT = DateTime.now();
         if (mStartYear == -1 || mStartMonth == -1 || mStartDayOfMonth == -1 || mStartHour == -1 || mEndMinute == -1) {
@@ -339,21 +360,6 @@ public class Options implements Parcelable {
 
     public long[] getDateRange() {
         return new long[]{mMinDate, mMaxDate};
-    }
-
-    public int[] getTimeParams() {
-        if (mStartHour == -1 || mStartMinute == -1) {
-            DateTime dateTime = DateTime.now();
-            LocalTime time = LocalTime.now();
-            mStartHour = time.getHourOfDay();
-            mStartMinute = time.getMinuteOfHour();
-        }
-        if (mEndHour == -1 || mEndMinute == -1) {
-            mEndHour = mStartHour;
-            mEndMinute = mStartMinute;
-        }
-
-        return new int[]{mStartHour, mStartMinute, mEndHour, mEndMinute};
     }
 
     public boolean is24HourView() {
