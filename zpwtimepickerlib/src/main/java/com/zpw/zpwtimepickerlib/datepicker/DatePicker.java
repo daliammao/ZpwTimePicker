@@ -72,9 +72,9 @@ public class DatePicker extends FrameLayout {
     private static final int VIEW_MONTH_DAY = 0;
     private static final int VIEW_YEAR = 1;
 
-    private static final int RANGE_ACTIVATED_NONE = 0;
-    private static final int RANGE_ACTIVATED_START = 1;
-    private static final int RANGE_ACTIVATED_END = 2;
+    public static final int RANGE_ACTIVATED_NONE = 0;
+    public static final int RANGE_ACTIVATED_START = 1;
+    public static final int RANGE_ACTIVATED_END = 2;
 
     private static final int DEFAULT_START_YEAR = 1900;
     private static final int DEFAULT_END_YEAR = 2100;
@@ -730,6 +730,10 @@ public class DatePicker extends FrameLayout {
 
     public int getFirstDayOfWeek() {
         return mFirstDayOfWeek;
+    }
+
+    public int getCurrentlyActivatedRangeItem() {
+        return mCurrentlyActivatedRangeItem;
     }
 
     @Override

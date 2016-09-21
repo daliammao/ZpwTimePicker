@@ -158,6 +158,7 @@ public class TimePicker extends FrameLayout {
         mHeaderView = mainView.findViewById(R.id.time_header);
 
         ivHeaderTimeReset = (ImageView) mainView.findViewById(R.id.iv_header_time_reset);
+        ivHeaderTimeReset.setOnClickListener(mClickListener);
 
         mRlHeaderTimeSingleCont = (RelativeLayout) mainView.findViewById(R.id.rl_header_time_single_cont);
         // Set up hour/minute labels.
@@ -360,6 +361,9 @@ public class TimePicker extends FrameLayout {
             } else if (vId == R.id.time_end) {
                 switchToEndWhenRange();
                 setCurrentItemShowing(HOUR_INDEX, true, true);
+            } else if (vId == R.id.iv_header_time_reset) {
+                mCurrentTime = new SelectedTime(mCurrentTime.getStartTime());
+                updateUI(HOUR_INDEX);
             } else {
                 // Failed to handle this click, don't vibrate.
                 return;
@@ -982,9 +986,9 @@ public class TimePicker extends FrameLayout {
 
     /**
      * The time separator is defined in the Unicode CLDR and cannot be supposed to be ":".
-     * <p/>
+     * <p>
      * See http://unicode.org/cldr/trac/browser/trunk/common/main
-     * <p/>
+     * <p>
      * We pass the correct "skeleton" depending on 12 or 24 hours view and then extract the
      * separator as the character which is just after the hour marker in the returned pattern.
      */

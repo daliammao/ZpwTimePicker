@@ -286,13 +286,23 @@ public class DateTimePicker extends FrameLayout implements
             llMainContentHolder.setVisibility(View.VISIBLE);
 
             if (mButtonLayout.isSwitcherButtonEnabled()) {
-                LocalTime toFormat = new LocalTime(mTimePicker.getCurrentHour(), mTimePicker.getCurrentMinute());
+                SelectedTime selectedTime = mTimePicker.getCurrentTime();
 
-                switchButtonText = mListener.formatTime(toFormat);
-
-                if (TextUtils.isEmpty(switchButtonText)) {
-                    switchButtonText = toFormat.toString(mDefaultTimeFormatter);
+                if (mDatePicker != null &&
+                        mDatePicker.getCurrentlyActivatedRangeItem() != DatePicker.RANGE_ACTIVATED_NONE) {
+                    LocalTime temp = mDatePicker.getCurrentlyActivatedRangeItem() == DatePicker.RANGE_ACTIVATED_START ?
+                            selectedTime.getStartTime() : selectedTime.getEndTime();
+                    switchButtonText = mListener.formatTime(temp);
+                    if (TextUtils.isEmpty(switchButtonText)) {
+                        switchButtonText = temp.toString(mDefaultTimeFormatter);
+                    }
+                } else {
+                    switchButtonText = mListener.formatTime(selectedTime.getStartTime());
+                    if (TextUtils.isEmpty(switchButtonText)) {
+                        switchButtonText = selectedTime.getStartTime().toString(mDefaultTimeFormatter);
+                    }
                 }
+
 
                 mButtonLayout.updateSwitcherText(Options.Picker.DATE_PICKER, switchButtonText);
             }
@@ -595,8 +605,6 @@ public class DateTimePicker extends FrameLayout implements
 
     @Override
     public void onDateChanged(DatePicker view, SelectedDate selectedDate) {
-        // TODO: Consider removing this propagation of date change event altogether
-        mDatePicker.init(selectedDate, mOptions.getPickerTypeForDate(), this);
     }
 
     @Override
