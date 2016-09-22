@@ -375,7 +375,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
         public void onDayClick(MonthView view, Calendar day) {
             if (day != null) {
                 if (mDaySelectionEventListener != null) {
-                    mDaySelectionEventListener.onDaySelected(DayPickerPagerAdapter.this, new LocalDate(day));
+                    mDaySelectionEventListener.onDaySelected(DayPickerPagerAdapter.this, LocalDate.fromCalendarFields(day));
                 }
             }
         }
@@ -398,7 +398,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             final ViewHolder newMonthView = mItems.get(position, null);
             if (newMonthView != null) {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
-                LocalDate selectedDayStart = new LocalDate(newMonthView.calendar.composeDate(dayOfMonth));
+                LocalDate selectedDayStart = LocalDate.fromCalendarFields(newMonthView.calendar.composeDate(dayOfMonth));
                 mTempSelectedDay.setDate(selectedDayStart);
                 return mTempSelectedDay;
             }
@@ -412,7 +412,7 @@ class DayPickerPagerAdapter extends PagerAdapter {
             final ViewHolder newMonthView = mItems.get(position, null);
             if (newMonthView != null) {
                 final int dayOfMonth = newMonthView.calendar.getDayAtLocation(x, y);
-                LocalDate selectedDayEnd = new LocalDate(newMonthView.calendar.composeDate(dayOfMonth));
+                LocalDate selectedDayEnd = LocalDate.fromCalendarFields(newMonthView.calendar.composeDate(dayOfMonth));
 
                 if (!updateIfNecessary || !mSelectedDay.getEndDate().isEqual(selectedDayEnd)) {
                     mTempSelectedDay.setEndDate(selectedDayEnd);

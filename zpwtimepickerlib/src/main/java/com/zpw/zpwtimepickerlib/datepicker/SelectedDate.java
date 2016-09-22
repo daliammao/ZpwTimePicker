@@ -10,8 +10,7 @@ import org.joda.time.LocalTime;
 /**
  * Created by Admin on 25/02/2016.
  */
-public class
-SelectedDate {
+public class SelectedDate {
     public enum Type {SINGLE, RANGE}
 
     private LocalDate mFirstDate, mSecondDate;
