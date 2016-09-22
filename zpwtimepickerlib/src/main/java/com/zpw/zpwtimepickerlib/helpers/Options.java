@@ -61,7 +61,7 @@ public class Options implements Parcelable {
             mStartHour = -1, mStartMinute = -1,
             mEndHour = -1, mEndMinute = -1;
     private long mMinDate = Long.MIN_VALUE, mMaxDate = Long.MIN_VALUE;
-    private boolean mAnimateLayoutChanges, mIs24HourView;
+    private boolean mAnimateLayoutChanges, mIs24HourView = true;
 
     private RecurrencePicker.RecurrenceOption mRecurrenceOption
             = RecurrencePicker.RecurrenceOption.DOES_NOT_REPEAT;

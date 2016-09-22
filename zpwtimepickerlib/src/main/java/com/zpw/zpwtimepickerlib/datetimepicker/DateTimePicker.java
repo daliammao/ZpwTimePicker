@@ -139,6 +139,8 @@ public class DateTimePicker extends FrameLayout implements
 
             if (mDatePickerEnabled) {
                 selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(mStartTime, mEndTime);
+            } else {
+                selectedDateTime = new SelectedDate(LocalDate.now()).toSelectedDateTime(mStartTime, mEndTime);
             }
 
             RecurrencePicker.RecurrenceOption recurrenceOption
@@ -667,8 +669,19 @@ public class DateTimePicker extends FrameLayout implements
                     mEndTime = selectedTime.getEndTime();
                     break;
             }
-        } else {
-            mStartTime = mEndTime = selectedTime.getStartTime();
+        } else if(mTimePickerEnabled){
+            //如果不存在date选择,则按以下规则更新time
+            switch (mTimePicker.getCurrentlyActivatedRangeItem()) {
+                case TimePicker.RANGE_ACTIVATED_NONE:
+                    mStartTime = mEndTime = selectedTime.getStartTime();
+                    break;
+                case TimePicker.RANGE_ACTIVATED_START:
+                    mStartTime = selectedTime.getStartTime();
+                    break;
+                case TimePicker.RANGE_ACTIVATED_END:
+                    mEndTime = selectedTime.getEndTime();
+                    break;
+            }
         }
     }
 }

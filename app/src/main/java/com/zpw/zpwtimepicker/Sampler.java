@@ -66,13 +66,14 @@ public class Sampler extends AppCompatActivity {
     // Views to display the chosen Date, Time & Recurrence options
     TextView tvYear, tvMonth, tvDay, tvHour,
             tvMinute, tvRecurrenceOption, tvRecurrenceRule,
-            tvStartDate, tvEndDate;
+            tvStartDate, tvEndDate,
+            tvStartTime, tvEndTime;
     RelativeLayout rlDateTimeRecurrenceInfo;
     LinearLayout llDateHolder, llDateRangeHolder;
+    LinearLayout llTimeHolder, llTimeRangeHolder;
 
     // Chosen values
     SelectedDateTime mSelectedDateTime;
-    int mHour, mMinute;
     String mRecurrenceOption, mRecurrenceRule;
 
     PickerDialog.Callback mFragmentCallback = new PickerDialog.Callback() {
@@ -87,8 +88,6 @@ public class Sampler extends AppCompatActivity {
                                             String recurrenceRule) {
 
             mSelectedDateTime = selectedDateTime;
-            mHour = mSelectedDateTime.getStartDateTime().getHourOfDay();
-            mMinute = mSelectedDateTime.getStartDateTime().getMinuteOfHour();
             mRecurrenceOption = recurrenceOption != null ?
                     recurrenceOption.name() : "n/a";
             mRecurrenceRule = recurrenceRule != null ?
@@ -143,6 +142,9 @@ public class Sampler extends AppCompatActivity {
         llDateHolder = (LinearLayout) findViewById(R.id.llDateHolder);
         llDateRangeHolder = (LinearLayout) findViewById(R.id.llDateRangeHolder);
 
+        llTimeHolder = (LinearLayout) findViewById(R.id.llTimeHolder);
+        llTimeRangeHolder = (LinearLayout) findViewById(R.id.llTimeRangeHolder);
+
         // Initialize views to display the chosen Date, Time & Recurrence options
         tvYear = ((TextView) findViewById(R.id.tvYear));
         tvMonth = ((TextView) findViewById(R.id.tvMonth));
@@ -150,6 +152,9 @@ public class Sampler extends AppCompatActivity {
 
         tvStartDate = ((TextView) findViewById(R.id.tvStartDate));
         tvEndDate = ((TextView) findViewById(R.id.tvEndDate));
+
+        tvStartTime = (TextView) findViewById(R.id.tvStartTime);
+        tvEndTime = ((TextView) findViewById(R.id.tvEndTime));
 
         tvHour = ((TextView) findViewById(R.id.tvHour));
         tvMinute = ((TextView) findViewById(R.id.tvMinute));
@@ -266,8 +271,6 @@ public class Sampler extends AppCompatActivity {
                     mSelectedDateTime = new SelectedDateTime(startCal.toDateTime(LocalTime.now()), endCal.toDateTime(LocalTime.now()));
                 }
 
-                mHour = savedInstanceState.getInt(SS_HOUR);
-                mMinute = savedInstanceState.getInt(SS_MINUTE);
                 mRecurrenceOption = savedInstanceState.getString(SS_RECURRENCE_OPTION);
                 mRecurrenceRule = savedInstanceState.getString(SS_RECURRENCE_RULE);
 
@@ -323,7 +326,7 @@ public class Sampler extends AppCompatActivity {
         options.setDisplayOptions(displayOptions);
 
         // Enable/disable the date range selection feature
-        options.setPickerType(cbAllowDateRangeSelection.isChecked()? Options.PickerType.BOTH: Options.PickerType.RANGE);
+        options.setPickerType(cbAllowDateRangeSelection.isChecked() ? Options.PickerType.BOTH : Options.PickerType.RANGE);
 
         // Example for setting date range:
         // Note that you can pass a date range as the initial date params
@@ -402,10 +405,23 @@ public class Sampler extends AppCompatActivity {
                 tvEndDate.setText(applyBoldStyle("END: ")
                         .append(DateFormat.getDateInstance().format(mSelectedDateTime.getEndDateTime().toDate().getTime())));
             }
-        }
 
-        tvHour.setText(applyBoldStyle("HOUR: ").append(String.valueOf(mHour)));
-        tvMinute.setText(applyBoldStyle("MINUTE: ").append(String.valueOf(mMinute)));
+            if (mSelectedDateTime.getType() == SelectedDateTime.Type.SINGLE) {
+                llTimeRangeHolder.setVisibility(View.GONE);
+                llTimeHolder.setVisibility(View.VISIBLE);
+
+                tvHour.setText(applyBoldStyle("HOUR: ").append(String.valueOf(mSelectedDateTime.getStartDateTime().getHourOfDay())));
+                tvMinute.setText(applyBoldStyle("MINUTE: ").append(String.valueOf(mSelectedDateTime.getStartDateTime().getMinuteOfHour())));
+            } else if (mSelectedDateTime.getType() == SelectedDateTime.Type.RANGE) {
+                llTimeHolder.setVisibility(View.GONE);
+                llTimeRangeHolder.setVisibility(View.VISIBLE);
+
+                tvStartTime.setText(applyBoldStyle("START: ")
+                        .append(DateFormat.getTimeInstance().format(mSelectedDateTime.getStartDateTime().toDate().getTime())));
+                tvEndTime.setText(applyBoldStyle("END: ")
+                        .append(DateFormat.getTimeInstance().format(mSelectedDateTime.getEndDateTime().toDate().getTime())));
+            }
+        }
 
         tvRecurrenceOption.setText(applyBoldStyle("RECURRENCE OPTION: ")
                 .append(mRecurrenceOption));
@@ -450,7 +466,7 @@ public class Sampler extends AppCompatActivity {
         outState.putBoolean(SS_RECURRENCE_PICKER_CHECKED, cbRecurrencePicker.isChecked());
         outState.putBoolean(SS_ALLOW_DATE_RANGE_SELECTION, cbAllowDateRangeSelection.isChecked());
 
-        int startYear = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getYear(): INVALID_VAL;
+        int startYear = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getYear() : INVALID_VAL;
         int startMonth = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getMonthOfYear() : INVALID_VAL;
         int startDayOfMonth = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getDayOfMonth() : INVALID_VAL;
 
@@ -465,8 +481,6 @@ public class Sampler extends AppCompatActivity {
         outState.putInt(SS_END_YEAR, endYear);
         outState.putInt(SS_END_MONTH, endMonth);
         outState.putInt(SS_END_DAY, endDayOfMonth);
-        outState.putInt(SS_HOUR, mHour);
-        outState.putInt(SS_MINUTE, mMinute);
         outState.putString(SS_RECURRENCE_OPTION, mRecurrenceOption);
         outState.putString(SS_RECURRENCE_RULE, mRecurrenceRule);
         outState.putBoolean(SS_INFO_VIEW_VISIBILITY,

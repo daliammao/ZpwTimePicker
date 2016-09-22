@@ -14,6 +14,7 @@
      limitations under the License.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f6f6f6">
@@ -141,7 +142,8 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="gone"
+                tools:visibility="visible">
 
                 <TextView
                     android:id="@+id/tvDateLabel"
@@ -239,45 +241,79 @@
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
-                    android:id="@+id/llTimeHolder"
+                <FrameLayout
+                    android:id="@+id/flTimeHolder"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/tvTimeLabel"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
-                    android:background="@drawable/info_bg"
-                    android:orientation="horizontal">
+                    android:background="@drawable/info_bg">
 
-                    <TextView
-                        android:id="@+id/tvHour"
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:id="@+id/llTimeHolder"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:layout_weight="1"
-                        android:textColor="@android:color/white" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/tvMinute"
-                        android:layout_width="0dp"
+                        <TextView
+                            android:id="@+id/tvHour"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            android:textColor="@android:color/white" />
+
+                        <TextView
+                            android:id="@+id/tvMinute"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            android:textColor="@android:color/white" />
+
+                        <Space
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llTimeRangeHolder"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:layout_weight="1"
-                        android:textColor="@android:color/white" />
+                        android:orientation="vertical">
 
-                    <Space
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:layout_weight="1" />
+                        <TextView
+                            android:id="@+id/tvStartTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginTop="10dp"
+                            android:textColor="@android:color/white" />
 
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvEndTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:textColor="@android:color/white" />
+                    </LinearLayout>
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvRecurrenceLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/llTimeHolder"
+                    android:layout_below="@id/flTimeHolder"
                     android:layout_marginLeft="10dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="10dp"
