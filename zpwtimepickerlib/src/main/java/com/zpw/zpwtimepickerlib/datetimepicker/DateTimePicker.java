@@ -102,6 +102,9 @@ public class DateTimePicker extends FrameLayout implements
             mDatePickerEnabled, mTimePickerEnabled, mRecurrencePickerEnabled,
             mDatePickerSyncStateCalled;
 
+    private LocalTime mStartTime = new LocalTime(0, 0, 0);
+    private LocalTime mEndTime = new LocalTime(0, 0, 0);
+
     // Used if listener returns
     // null/invalid(zero-length, empty) string
     private DateTimeFormatter mDefaultDateFormatter, mDefaultTimeFormatter;
@@ -132,15 +135,10 @@ public class DateTimePicker extends FrameLayout implements
         public void onOkay() {
             SelectedDateTime selectedDateTime = null;
 
-            int hour = -1, minute = -1;
-
-            if (mTimePickerEnabled) {
-                hour = mTimePicker.getCurrentHour();
-                minute = mTimePicker.getCurrentMinute();
-            }
+            verificationTime();
 
             if (mDatePickerEnabled) {
-                selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(new LocalTime(hour, minute), LocalTime.now());
+                selectedDateTime = mDatePicker.getSelectedDate().toSelectedDateTime(mStartTime, mEndTime);
             }
 
             RecurrencePicker.RecurrenceOption recurrenceOption
@@ -276,6 +274,8 @@ public class DateTimePicker extends FrameLayout implements
 
             if (mTimePickerEnabled) {
                 mTimePicker.setVisibility(View.GONE);
+
+                verificationTime();
             }
 
             if (mRecurrencePickerEnabled) {
@@ -286,20 +286,18 @@ public class DateTimePicker extends FrameLayout implements
             llMainContentHolder.setVisibility(View.VISIBLE);
 
             if (mButtonLayout.isSwitcherButtonEnabled()) {
-                SelectedTime selectedTime = mTimePicker.getCurrentTime();
-
                 if (mDatePicker != null &&
                         mDatePicker.getCurrentlyActivatedRangeItem() != DatePicker.RANGE_ACTIVATED_NONE) {
                     LocalTime temp = mDatePicker.getCurrentlyActivatedRangeItem() == DatePicker.RANGE_ACTIVATED_START ?
-                            selectedTime.getStartTime() : selectedTime.getEndTime();
+                            mStartTime : mEndTime;
                     switchButtonText = mListener.formatTime(temp);
                     if (TextUtils.isEmpty(switchButtonText)) {
                         switchButtonText = temp.toString(mDefaultTimeFormatter);
                     }
                 } else {
-                    switchButtonText = mListener.formatTime(selectedTime.getStartTime());
+                    switchButtonText = mListener.formatTime(mStartTime);
                     if (TextUtils.isEmpty(switchButtonText)) {
-                        switchButtonText = selectedTime.getStartTime().toString(mDefaultTimeFormatter);
+                        switchButtonText = mStartTime.toString(mDefaultTimeFormatter);
                     }
                 }
 
@@ -313,6 +311,12 @@ public class DateTimePicker extends FrameLayout implements
         } else if (mCurrentPicker == Options.Picker.TIME_PICKER) {
             if (mDatePickerEnabled) {
                 mDatePicker.setVisibility(View.GONE);
+
+                if (mDatePicker.getCurrentlyActivatedRangeItem() != DatePicker.RANGE_ACTIVATED_NONE) {
+                    LocalTime temp = mDatePicker.getCurrentlyActivatedRangeItem() == DatePicker.RANGE_ACTIVATED_START ?
+                            mStartTime : mEndTime;
+                    mTimePicker.setCurrentTime(new SelectedTime(temp));
+                }
             }
 
             if (mRecurrencePickerEnabled) {
@@ -370,6 +374,26 @@ public class DateTimePicker extends FrameLayout implements
             final float days = period.getDays();
 
             return "~" + days + " " + (days == 1 ? "day" : "days");
+        }
+    }
+
+    private void verificationTime() {
+        if (mDatePickerEnabled && mTimePickerEnabled) {
+            switch (mDatePicker.getCurrentlyActivatedRangeItem()) {
+                case DatePicker.RANGE_ACTIVATED_START:
+                    if (mDatePicker.getSelectedDate().getType() == SelectedDate.Type.SINGLE
+                            && SelectedTime.compareTimes(mStartTime, mEndTime) == 1) {
+                        //如果日期选择同一天,开始时间>结束时间
+                        mEndTime = mStartTime;
+                    }
+                    break;
+                case DatePicker.RANGE_ACTIVATED_END:
+                    if (mDatePicker.getSelectedDate().getType() == SelectedDate.Type.SINGLE
+                            && SelectedTime.compareTimes(mStartTime, mEndTime) == 1) {
+                        mStartTime = mEndTime;
+                    }
+                    break;
+            }
         }
     }
 
@@ -554,8 +578,12 @@ public class DateTimePicker extends FrameLayout implements
         }
 
         if (mTimePickerEnabled) {
-            mTimePicker.init(mOptions.getTimeParams(), mOptions.getPickerTypeForTime(), TimePicker.HOUR_INDEX);
+            SelectedTime tempTime = mOptions.getTimeParams();
+            mTimePicker.init(tempTime, mOptions.getPickerTypeForTime(), TimePicker.HOUR_INDEX);
+            mTimePicker.setOnTimeChangedListener(this);
             mTimePicker.setIs24HourView(mOptions.is24HourView());
+            mStartTime = tempTime.getStartTime();
+            mEndTime = tempTime.getEndTime();
 
             ivRecurrenceOptionsTP.setVisibility(mRecurrencePickerEnabled ?
                     View.VISIBLE : View.GONE);
@@ -605,10 +633,42 @@ public class DateTimePicker extends FrameLayout implements
 
     @Override
     public void onDateChanged(DatePicker view, SelectedDate selectedDate) {
+        //当日期被改为single时 需要检查Time的有效性
+        verificationTime();
+    }
+
+    @Override
+    public void onDateRangeItemChange(DatePicker view, int rangeItem) {
+        if (mDatePicker != null &&
+                mDatePicker.getCurrentlyActivatedRangeItem() != DatePicker.RANGE_ACTIVATED_NONE) {
+
+            LocalTime temp = mDatePicker.getCurrentlyActivatedRangeItem() == DatePicker.RANGE_ACTIVATED_START ?
+                    mStartTime : mEndTime;
+            CharSequence switchButtonText = mListener.formatTime(temp);
+            if (TextUtils.isEmpty(switchButtonText)) {
+                switchButtonText = temp.toString(mDefaultTimeFormatter);
+            }
+
+            mButtonLayout.updateSwitcherText(Options.Picker.TIME_PICKER, switchButtonText);
+        }
     }
 
     @Override
     public void onTimeChanged(TimePicker view, SelectedTime selectedTime) {
-
+        if (mDatePickerEnabled) {
+            switch (mDatePicker.getCurrentlyActivatedRangeItem()) {
+                case DatePicker.RANGE_ACTIVATED_NONE:
+                    mStartTime = mEndTime = selectedTime.getStartTime();
+                    break;
+                case DatePicker.RANGE_ACTIVATED_START:
+                    mStartTime = selectedTime.getStartTime();
+                    break;
+                case DatePicker.RANGE_ACTIVATED_END:
+                    mEndTime = selectedTime.getEndTime();
+                    break;
+            }
+        } else {
+            mStartTime = mEndTime = selectedTime.getStartTime();
+        }
     }
 }

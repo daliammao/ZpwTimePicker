@@ -331,20 +331,20 @@ public class DatePicker extends FrameLayout {
                 mCurrentDate = new SelectedDate(day);
             }
 
-            onDateChanged(true, false, goToPosition);
+            onDateChanged(true, true, goToPosition);
         }
 
         @Override
         public void onDateRangeSelectionStarted(@NonNull SelectedDate selectedDate) {
             mCurrentDate = new SelectedDate(selectedDate);
-            onDateChanged(false, false, false);
+            onDateChanged(false, true, false);
         }
 
         @Override
         public void onDateRangeSelectionEnded(@Nullable SelectedDate selectedDate) {
             if (selectedDate != null) {
                 mCurrentDate = new SelectedDate(selectedDate);
-                onDateChanged(false, false, false);
+                onDateChanged(false, true, false);
             }
         }
 
@@ -355,7 +355,7 @@ public class DatePicker extends FrameLayout {
             }
 
             mCurrentDate = new SelectedDate(selectedDate);
-            onDateChanged(false, false, false);
+            onDateChanged(false, true, false);
         }
     };
 
@@ -400,15 +400,13 @@ public class DatePicker extends FrameLayout {
                 setCurrentView(VIEW_MONTH_DAY);
             } else if (v.getId() == R.id.tv_header_date_start) {
                 mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_START;
-                tvHeaderDateStart.setActivated(true);
-                tvHeaderDateEnd.setActivated(false);
+                onRangeItemChange(true);
             } else if (v.getId() == R.id.tv_header_date_end) {
                 mCurrentlyActivatedRangeItem = RANGE_ACTIVATED_END;
-                tvHeaderDateStart.setActivated(false);
-                tvHeaderDateEnd.setActivated(true);
+                onRangeItemChange(true);
             } else if (v.getId() == R.id.iv_header_date_reset) {
                 mCurrentDate = new SelectedDate(mCurrentDate.getStartDate());
-                onDateChanged(true, false, true);
+                onDateChanged(true, true, true);
             }
         }
     };
@@ -534,10 +532,10 @@ public class DatePicker extends FrameLayout {
      * Initialize the state. If the provided values designate an inconsistent
      * date the values are normalized before updating the spinners.
      *
-     * @param selectedDate   The initial date or date range.
-     * @param pickerType type of date range selection
-     * @param callback       How user is notified date is changed by
-     *                       user, can be null.
+     * @param selectedDate The initial date or date range.
+     * @param pickerType   type of date range selection
+     * @param callback     How user is notified date is changed by
+     *                     user, can be null.
      */
     public void init(SelectedDate selectedDate, Options.PickerType pickerType,
                      OnDateChangedListener callback) {
@@ -590,6 +588,27 @@ public class DatePicker extends FrameLayout {
         }
     }
 
+    private void onRangeItemChange(boolean callbackToClient) {
+        if (callbackToClient && mDateChangedListener != null) {
+            mDateChangedListener.onDateRangeItemChange(this, mCurrentlyActivatedRangeItem);
+        }
+
+        switch (mCurrentlyActivatedRangeItem) {
+            case RANGE_ACTIVATED_START:
+                tvHeaderDateStart.setActivated(true);
+                tvHeaderDateEnd.setActivated(false);
+                break;
+            case RANGE_ACTIVATED_END:
+                tvHeaderDateStart.setActivated(false);
+                tvHeaderDateEnd.setActivated(true);
+                break;
+            case RANGE_ACTIVATED_NONE:
+                mHeaderMonthDay.setActivated(true);
+                mHeaderYear.setActivated(false);
+                break;
+        }
+    }
+
     private void updateHeaderViews() {
         if (BuildConfig.DEBUG) {
             Log.i(TAG, "updateHeaderViews(): First Date: "
@@ -623,8 +642,7 @@ public class DatePicker extends FrameLayout {
         llHeaderDateRangeCont.setVisibility(View.INVISIBLE);
         llHeaderDateSingleCont.setVisibility(View.VISIBLE);
 
-        mHeaderMonthDay.setActivated(true);
-        mHeaderYear.setActivated(false);
+        onRangeItemChange(true);
     }
 
     private void switchToDateRangeView() {
@@ -636,8 +654,7 @@ public class DatePicker extends FrameLayout {
         ivHeaderDateReset.setVisibility(View.VISIBLE);
         llHeaderDateRangeCont.setVisibility(View.VISIBLE);
 
-        tvHeaderDateStart.setActivated(mCurrentlyActivatedRangeItem == RANGE_ACTIVATED_START);
-        tvHeaderDateEnd.setActivated(mCurrentlyActivatedRangeItem == RANGE_ACTIVATED_END);
+        onRangeItemChange(true);
     }
 
     public SelectedDate getSelectedDate() {
@@ -782,7 +799,7 @@ public class DatePicker extends FrameLayout {
 
         return new SavedState(superState, mCurrentDate, mMinDate.toDate().getTime(),
                 mMaxDate.toDate().getTime(), mCurrentView, listPosition,
-                listPositionOffset, mCurrentlyActivatedRangeItem,mPickerType);
+                listPositionOffset, mCurrentlyActivatedRangeItem, mPickerType);
     }
 
     @SuppressLint("NewApi")
@@ -994,5 +1011,7 @@ public class DatePicker extends FrameLayout {
          * @param selectedDate The date that was set.
          */
         void onDateChanged(DatePicker view, SelectedDate selectedDate);
+
+        void onDateRangeItemChange(DatePicker view, int rangeItem);
     }
 }

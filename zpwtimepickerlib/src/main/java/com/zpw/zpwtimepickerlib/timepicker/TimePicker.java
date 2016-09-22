@@ -48,9 +48,9 @@ import java.util.Locale;
 public class TimePicker extends FrameLayout {
     private static final String TAG = TimePicker.class.getSimpleName();
 
-    private static final int RANGE_ACTIVATED_NONE = 0;
-    private static final int RANGE_ACTIVATED_START = 1;
-    private static final int RANGE_ACTIVATED_END = 2;
+    public static final int RANGE_ACTIVATED_NONE = 0;
+    public static final int RANGE_ACTIVATED_START = 1;
+    public static final int RANGE_ACTIVATED_END = 2;
 
     // Index used by RadialPickerLayout
     public static final int HOUR_INDEX = 0;
@@ -662,6 +662,14 @@ public class TimePicker extends FrameLayout {
         return mCurrentTime;
     }
 
+    public void setCurrentTime(SelectedTime selectedTime){
+        mCurrentTime = selectedTime;
+
+        updateUI(HOUR_INDEX);
+        onTimeChanged();
+    }
+
+
     /**
      * Set whether in 24 hour or AM/PM mode.
      *
@@ -699,6 +707,10 @@ public class TimePicker extends FrameLayout {
      */
     public boolean is24HourView() {
         return mIs24HourView;
+    }
+
+    public int getCurrentlyActivatedRangeItem() {
+        return mCurrentlyActivatedRangeItem;
     }
 
     @SuppressWarnings("unused")

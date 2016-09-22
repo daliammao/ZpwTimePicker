@@ -101,8 +101,8 @@ SelectedDate {
         mSecondDate = mSecondDate.withField(field,value);
     }
 
-    public SelectedDateTime toSelectedDateTime(LocalTime firstTime, LocalTime secondTime) {
-        return new SelectedDateTime(mFirstDate.toDateTime(firstTime), mSecondDate.toDateTime(secondTime));
+    public SelectedDateTime toSelectedDateTime(LocalTime startTime, LocalTime endTime) {
+        return new SelectedDateTime(getStartDate().toDateTime(startTime), getEndDate().toDateTime(endTime));
     }
 
     @Override
