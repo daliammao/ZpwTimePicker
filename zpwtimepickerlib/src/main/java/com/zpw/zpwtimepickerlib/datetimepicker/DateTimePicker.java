@@ -671,17 +671,8 @@ public class DateTimePicker extends FrameLayout implements
             }
         } else if(mTimePickerEnabled){
             //如果不存在date选择,则按以下规则更新time
-            switch (mTimePicker.getCurrentlyActivatedRangeItem()) {
-                case TimePicker.RANGE_ACTIVATED_NONE:
-                    mStartTime = mEndTime = selectedTime.getStartTime();
-                    break;
-                case TimePicker.RANGE_ACTIVATED_START:
-                    mStartTime = selectedTime.getStartTime();
-                    break;
-                case TimePicker.RANGE_ACTIVATED_END:
-                    mEndTime = selectedTime.getEndTime();
-                    break;
-            }
+            mStartTime = selectedTime.getStartTime();
+            mEndTime = selectedTime.getEndTime();
         }
     }
 }

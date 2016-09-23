@@ -123,16 +123,38 @@
                 android:textSize="@dimen/sampler_text_size"
                 android:textStyle="bold" />
 
-            <CheckBox
-                android:id="@+id/cbAllowDateRangeSelection"
+            <RadioGroup
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginTop="10dp"
-                android:text="Allow date range selection?"
-                android:textSize="@dimen/sampler_text_size" />
+                android:animateLayoutChanges="true"
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingTop="10dp">
+
+                <RadioButton
+                    android:id="@+id/rbAllowDateRangeSelection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Allow date range selection?"
+                    android:textSize="@dimen/sampler_text_size" />
+
+                <RadioButton
+                    android:id="@+id/rbSingle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Single"
+                    android:textSize="@dimen/sampler_text_size" />
+
+                <RadioButton
+                    android:id="@+id/rbRange"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Range"
+                    android:textSize="@dimen/sampler_text_size" />
+
+            </RadioGroup>
 
             <RelativeLayout
                 android:id="@+id/rlDateTimeRecurrenceInfo"

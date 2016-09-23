@@ -55,8 +55,9 @@ public class Sampler extends AppCompatActivity {
     ImageView ivLaunchPicker;
 
     // SublimePicker options
-    CheckBox cbDatePicker, cbTimePicker, cbRecurrencePicker, cbAllowDateRangeSelection;
-    RadioButton rbDatePicker, rbTimePicker, rbRecurrencePicker;
+    CheckBox cbDatePicker, cbTimePicker, cbRecurrencePicker;
+    RadioButton rbDatePicker, rbTimePicker, rbRecurrencePicker,
+            rbAllowDateRangeSelection, rbSingle, rbRange;
 
     // Labels
     TextView tvPickerToShow, tvActivatedPickers;
@@ -99,7 +100,7 @@ public class Sampler extends AppCompatActivity {
                 @Override
                 public void run() {
                     svMainContainer.scrollTo(svMainContainer.getScrollX(),
-                            cbAllowDateRangeSelection.getBottom());
+                            rbRange.getBottom());
                 }
             });
         }
@@ -137,7 +138,9 @@ public class Sampler extends AppCompatActivity {
         tvActivatedPickers = (TextView) findViewById(R.id.tvActivatedPickers);
         svMainContainer = (ScrollView) findViewById(R.id.svMainContainer);
 
-        cbAllowDateRangeSelection = (CheckBox) findViewById(R.id.cbAllowDateRangeSelection);
+        rbAllowDateRangeSelection = (RadioButton) findViewById(R.id.rbAllowDateRangeSelection);
+        rbSingle = (RadioButton) findViewById(R.id.rbSingle);
+        rbRange = (RadioButton) findViewById(R.id.rbRange);
 
         llDateHolder = (LinearLayout) findViewById(R.id.llDateHolder);
         llDateRangeHolder = (LinearLayout) findViewById(R.id.llDateRangeHolder);
@@ -222,13 +225,6 @@ public class Sampler extends AppCompatActivity {
             }
         });
 
-        cbAllowDateRangeSelection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
-
         // restore state
         dealWithSavedInstanceState(savedInstanceState);
     }
@@ -238,7 +234,7 @@ public class Sampler extends AppCompatActivity {
             cbDatePicker.setChecked(true);
             cbTimePicker.setChecked(true);
             cbRecurrencePicker.setChecked(true);
-            cbAllowDateRangeSelection.setChecked(false);
+            rbAllowDateRangeSelection.setChecked(true);
 
             rbDatePicker.setChecked(true);
         } else { // Restore
@@ -246,8 +242,10 @@ public class Sampler extends AppCompatActivity {
             cbTimePicker.setChecked(savedInstanceState.getBoolean(SS_TIME_PICKER_CHECKED));
             cbRecurrencePicker
                     .setChecked(savedInstanceState.getBoolean(SS_RECURRENCE_PICKER_CHECKED));
-            cbAllowDateRangeSelection
+            rbAllowDateRangeSelection
                     .setChecked(savedInstanceState.getBoolean(SS_ALLOW_DATE_RANGE_SELECTION));
+            rbSingle.setChecked(savedInstanceState.getBoolean(SS_SINGLE));
+            rbRange.setChecked(savedInstanceState.getBoolean(SS_RANGE));
 
             rbDatePicker.setVisibility(cbDatePicker.isChecked() ?
                     View.VISIBLE : View.GONE);
@@ -322,12 +320,17 @@ public class Sampler extends AppCompatActivity {
         } else if (rbRecurrencePicker.getVisibility() == View.VISIBLE && rbRecurrencePicker.isChecked()) {
             options.setPickerToShow(Options.Picker.REPEAT_OPTION_PICKER);
         }
-        options.setTimeParams(3,10,5,40,true);
-        options.setDateRange(LocalDate.now().toDate().getTime(),LocalDate.now().plusMonths(1).toDate().getTime());
+        options.setTimeParams(3, 10, 5, 40, true);
+        options.setDateRange(LocalDate.now().toDate().getTime(), LocalDate.now().plusMonths(1).toDate().getTime());
         options.setDisplayOptions(displayOptions);
 
-        // Enable/disable the date range selection feature
-        options.setPickerType(cbAllowDateRangeSelection.isChecked() ? Options.PickerType.BOTH : Options.PickerType.RANGE);
+        if(rbAllowDateRangeSelection.isChecked()){
+            options.setPickerType(Options.PickerType.BOTH);
+        }else if(rbRange.isChecked()){
+            options.setPickerType(Options.PickerType.RANGE);
+        }else if(rbSingle.isChecked()){
+            options.setPickerType(Options.PickerType.SINGLE);
+        }
 
         // Example for setting date range:
         // Note that you can pass a date range as the initial date params
@@ -445,6 +448,8 @@ public class Sampler extends AppCompatActivity {
     final String SS_TIME_PICKER_CHECKED = "saved.state.time.picker.checked";
     final String SS_RECURRENCE_PICKER_CHECKED = "saved.state.recurrence.picker.checked";
     final String SS_ALLOW_DATE_RANGE_SELECTION = "saved.state.allow.date.range.selection";
+    final String SS_SINGLE = "saved.state.allow.date.single";
+    final String SS_RANGE = "saved.state.allow.date.range";
     final String SS_START_YEAR = "saved.state.start.year";
     final String SS_START_MONTH = "saved.state.start.month";
     final String SS_START_DAY = "saved.state.start.day";
@@ -463,7 +468,9 @@ public class Sampler extends AppCompatActivity {
         outState.putBoolean(SS_DATE_PICKER_CHECKED, cbDatePicker.isChecked());
         outState.putBoolean(SS_TIME_PICKER_CHECKED, cbTimePicker.isChecked());
         outState.putBoolean(SS_RECURRENCE_PICKER_CHECKED, cbRecurrencePicker.isChecked());
-        outState.putBoolean(SS_ALLOW_DATE_RANGE_SELECTION, cbAllowDateRangeSelection.isChecked());
+        outState.putBoolean(SS_ALLOW_DATE_RANGE_SELECTION, rbAllowDateRangeSelection.isChecked());
+        outState.putBoolean(SS_SINGLE, rbSingle.isChecked());
+        outState.putBoolean(SS_RANGE, rbRange.isChecked());
 
         int startYear = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getYear() : INVALID_VAL;
         int startMonth = mSelectedDateTime != null ? mSelectedDateTime.getStartDateTime().getMonthOfYear() : INVALID_VAL;
