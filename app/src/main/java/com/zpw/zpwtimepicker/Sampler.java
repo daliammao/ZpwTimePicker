@@ -321,7 +321,7 @@ public class Sampler extends AppCompatActivity {
             options.setPickerToShow(Options.Picker.REPEAT_OPTION_PICKER);
         }
         options.setTimeParams(3, 10, 5, 40, true);
-        options.setDateRange(LocalDate.now().toDate().getTime(), LocalDate.now().plusMonths(1).toDate().getTime());
+//        options.setDateRange(LocalDate.now().toDate().getTime(), LocalDate.now().plusMonths(1).toDate().getTime());
         options.setDisplayOptions(displayOptions);
 
         if(rbAllowDateRangeSelection.isChecked()){

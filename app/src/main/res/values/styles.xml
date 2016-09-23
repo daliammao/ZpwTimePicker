@@ -28,10 +28,11 @@
     </style>
 
     <style name="SPDefaultImpl" parent="SublimePickerStyleLight">
+        <!--主色调-->
         <item name="colorAccent">@color/c_accent</item>
-        <item name="colorPrimaryDark">@color/c_primary_dark</item>
-        <item name="colorPrimary">@color/c_primary</item>
+        <!--未激活字的颜色-->
         <item name="android:textColorPrimary">#212121</item>
+        
         <item name="android:textColorSecondary">#727272</item>
         <item name="android:textColorPrimaryInverse">#FFFFFF</item>
     </style>
