@@ -32,7 +32,7 @@
         <item name="colorAccent">@color/c_accent</item>
         <!--未激活字的颜色-->
         <item name="android:textColorPrimary">#212121</item>
-        
+
         <item name="android:textColorSecondary">#727272</item>
         <item name="android:textColorPrimaryInverse">#FFFFFF</item>
     </style>

@@ -414,7 +414,7 @@ public class TimePicker extends FrameLayout {
     }
 
     public void init(SelectedTime selectedTime, Options.PickerType pickerType, int index) {
-        mCurrentTime = selectedTime;
+        mCurrentTime = new SelectedTime(selectedTime);
         mPickerType = pickerType;
         updateUI(index);
     }
