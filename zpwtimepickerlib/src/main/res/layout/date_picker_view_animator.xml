@@ -23,11 +23,15 @@
     android:measureAllChildren="true"
     android:outAnimation="@anim/sp_date_picker_fade_out">
 
-    <com.zpw.zpwtimepickerlib.datepicker.DayPickerView
-        android:id="@+id/date_picker_day_picker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:tag="@string/sublime_date_picker_tag" />
+    <ScrollView
+        android:layout_width="500dp"
+        android:layout_height="wrap_content">
+        <com.zpw.zpwtimepickerlib.datepicker.DayPickerView
+            android:id="@+id/date_picker_day_picker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:tag="@string/sublime_date_picker_tag" />
+    </ScrollView>
 
     <com.zpw.zpwtimepickerlib.datepicker.YearPickerView
         android:id="@+id/date_picker_year_picker"

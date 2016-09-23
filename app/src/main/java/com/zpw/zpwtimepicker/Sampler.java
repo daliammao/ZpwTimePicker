@@ -322,7 +322,8 @@ public class Sampler extends AppCompatActivity {
         } else if (rbRecurrencePicker.getVisibility() == View.VISIBLE && rbRecurrencePicker.isChecked()) {
             options.setPickerToShow(Options.Picker.REPEAT_OPTION_PICKER);
         }
-//        options.setTimeParams(-1,-1,true);
+        options.setTimeParams(3,10,5,40,true);
+        options.setDateRange(LocalDate.now().toDate().getTime(),LocalDate.now().plusMonths(1).toDate().getTime());
         options.setDisplayOptions(displayOptions);
 
         // Enable/disable the date range selection feature
@@ -450,8 +451,6 @@ public class Sampler extends AppCompatActivity {
     final String SS_END_YEAR = "saved.state.end.year";
     final String SS_END_MONTH = "saved.state.end.month";
     final String SS_END_DAY = "saved.state.end.day";
-    final String SS_HOUR = "saved.state.hour";
-    final String SS_MINUTE = "saved.state.minute";
     final String SS_RECURRENCE_OPTION = "saved.state.recurrence.option";
     final String SS_RECURRENCE_RULE = "saved.state.recurrence.rule";
     final String SS_INFO_VIEW_VISIBILITY = "saved.state.info.view.visibility";
