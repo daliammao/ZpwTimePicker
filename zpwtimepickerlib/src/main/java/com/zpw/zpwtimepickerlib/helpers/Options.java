@@ -41,7 +41,9 @@ public class Options implements Parcelable {
     public enum Picker {DATE_PICKER, TIME_PICKER, REPEAT_OPTION_PICKER, INVALID}
 
     // 日期选择的展现类型
-    public enum PickerType {SINGLE, RANGE, BOTH, INVALID}
+    public enum PickerType {
+        SINGLE, RANGE, BOTH, INVALID
+    }
 
     // make DatePicker available
     public final static int ACTIVATE_DATE_PICKER = 0x01;
@@ -312,21 +314,21 @@ public class Options implements Parcelable {
         return new SelectedDate(startCal, endCal);
     }
 
-    public SelectedTime getTimeParams(){
+    public SelectedTime getTimeParams() {
         LocalTime startLt = LocalTime.now();
-        if(mStartHour == -1 || mStartMinute == -1){
+        if (mStartHour == -1 || mStartMinute == -1) {
             mStartHour = startLt.getHourOfDay();
             mStartMinute = startLt.getMinuteOfHour();
-        }else{
-            startLt = new LocalTime(mStartHour,mStartMinute);
+        } else {
+            startLt = new LocalTime(mStartHour, mStartMinute);
         }
 
         LocalTime endLt = LocalTime.now();
-        if(mEndHour == -1 || mEndMinute == -1){
+        if (mEndHour == -1 || mEndMinute == -1) {
             mEndHour = endLt.getHourOfDay();
             mEndMinute = endLt.getMinuteOfHour();
-        }else{
-            endLt = new LocalTime(mEndHour,mEndMinute);
+        } else {
+            endLt = new LocalTime(mEndHour, mEndMinute);
         }
 
         return new SelectedTime(startLt, endLt);
@@ -392,39 +394,42 @@ public class Options implements Parcelable {
         return mPickerType;
     }
 
-    public PickerType getPickerTypeForDateTime(){
-        if(isDatePickerActive()&&isTimePickerActive()){
-            if(mPickerType == PickerType.INVALID){
+    public PickerType getPickerTypeForDateTime() {
+        if (isDatePickerActive() && isTimePickerActive()) {
+            if (mPickerType == PickerType.INVALID) {
                 return PickerType.SINGLE;
-            }else{
+            } else {
                 return mPickerType;
             }
-        }else{
+        } else {
             return PickerType.INVALID;
         }
     }
 
-    public PickerType getPickerTypeForDate(){
-        if(isDatePickerActive()){
-            if(mPickerType == PickerType.INVALID){
+    public PickerType getPickerTypeForDate() {
+        if (isDatePickerActive()) {
+            if (mPickerType == PickerType.INVALID) {
                 return PickerType.SINGLE;
-            }else{
+            } else {
                 return mPickerType;
             }
-        }else{
+        } else {
             return PickerType.INVALID;
         }
     }
 
-    public PickerType getPickerTypeForTime(){
-        if(isTimePickerActive()){
+    public PickerType getPickerTypeForTime() {
+        if (isTimePickerActive()) {
             //如果日期和时间都可以选择,则时间选择只能是SINGLE,不支持不同日期有不同的时间段
-            if(mPickerType == PickerType.INVALID||isDatePickerActive()){
+            if (mPickerType == PickerType.INVALID || isDatePickerActive()) {
                 return PickerType.SINGLE;
-            }else{
+            } else if (mPickerType == PickerType.BOTH) {
+                //现在不支持
+                return PickerType.SINGLE;
+            } else {
                 return mPickerType;
             }
-        }else{
+        } else {
             return PickerType.INVALID;
         }
     }

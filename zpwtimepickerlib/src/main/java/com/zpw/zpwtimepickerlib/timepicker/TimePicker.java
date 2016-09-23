@@ -362,8 +362,7 @@ public class TimePicker extends FrameLayout {
                 switchToEndWhenRange();
                 setCurrentItemShowing(HOUR_INDEX, true, true);
             } else if (vId == R.id.iv_header_time_reset) {
-                mCurrentTime = new SelectedTime(mCurrentTime.getStartTime());
-                updateUI(HOUR_INDEX);
+                setCurrentTime(new SelectedTime(mCurrentTime.getStartTime()));
             } else {
                 // Failed to handle this click, don't vibrate.
                 return;
