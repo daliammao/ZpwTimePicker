@@ -46,9 +46,11 @@ import com.zpw.zpwtimepickerlib.timepicker.SelectedTime;
 import com.zpw.zpwtimepickerlib.timepicker.TimePicker;
 import com.zpw.zpwtimepickerlib.utilities.SUtils;
 
+import org.joda.time.Days;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
-import org.joda.time.Period;
+import org.joda.time.Months;
+import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -362,19 +364,14 @@ public class DateTimePicker extends FrameLayout implements
         // Move to next day since we are nulling out the time fields
         endDate = endDate.plusDays(1);
 
-        Period period = new Period(startDate, endDate);
-
-        if (period.getYears() > 0) {
-            final int years = period.getYears();
-
+        int years = Years.yearsBetween(startDate,endDate).getYears();
+        int months = Months.monthsBetween(startDate,endDate).getMonths();
+        int days = Days.daysBetween(startDate,endDate).getDays();
+        if (years > 0) {
             return "~" + years + " " + (years == 1 ? "year" : "years");
-        } else if (period.getMonths() > 0) {
-            final float months = period.getMonths();
-
+        } else if (months > 0) {
             return "~" + months + " " + (months == 1 ? "month" : "months");
         } else {
-            final float days = period.getDays();
-
             return "~" + days + " " + (days == 1 ? "day" : "days");
         }
     }
@@ -669,7 +666,7 @@ public class DateTimePicker extends FrameLayout implements
                     mEndTime = selectedTime.getEndTime();
                     break;
             }
-        } else if(mTimePickerEnabled){
+        } else if (mTimePickerEnabled) {
             //如果不存在date选择,则按以下规则更新time
             mStartTime = selectedTime.getStartTime();
             mEndTime = selectedTime.getEndTime();
