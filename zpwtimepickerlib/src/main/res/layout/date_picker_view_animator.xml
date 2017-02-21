@@ -24,7 +24,7 @@
     android:outAnimation="@anim/sp_date_picker_fade_out">
 
     <ScrollView
-        android:layout_width="500dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <com.zpw.zpwtimepickerlib.datepicker.DayPickerView
             android:id="@+id/date_picker_day_picker"
