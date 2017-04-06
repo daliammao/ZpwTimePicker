@@ -16,7 +16,7 @@
 */
 -->
 
-<com.zpw.zpwtimepickerlib.datepicker.DatePicker
+<com.daliammao.zpwtimepickerlib.datepicker.DatePicker
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/datePicker"
     android:layout_gravity="center_horizontal"

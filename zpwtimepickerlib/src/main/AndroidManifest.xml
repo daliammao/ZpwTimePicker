@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zpw.zpwtimepickerlib">
+    package="com.daliammao.zpwtimepickerlib">
 
     <application
         android:allowBackup="true"

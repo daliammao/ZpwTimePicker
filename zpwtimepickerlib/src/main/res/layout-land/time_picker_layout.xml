@@ -33,7 +33,7 @@
         android:layout_weight="1"
         android:orientation="vertical">
 
-        <com.zpw.zpwtimepickerlib.timepicker.RadialTimePickerView
+        <com.daliammao.zpwtimepickerlib.timepicker.RadialTimePickerView
             android:id="@+id/radial_picker"
             android:layout_width="match_parent"
             android:layout_height="0dp"

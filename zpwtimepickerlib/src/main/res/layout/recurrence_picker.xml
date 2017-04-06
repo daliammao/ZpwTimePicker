@@ -161,14 +161,14 @@
             </LinearLayout>
         </ScrollView>
 
-        <com.zpw.zpwtimepickerlib.common.DecisionButtonLayout
+        <com.daliammao.zpwtimepickerlib.common.DecisionButtonLayout
             android:id="@+id/roc_decision_button_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
-    <com.zpw.zpwtimepickerlib.recurrencepicker.RecurrenceEndDatePicker
+    <com.daliammao.zpwtimepickerlib.recurrencepicker.RecurrenceEndDatePicker
         android:id="@+id/date_only_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

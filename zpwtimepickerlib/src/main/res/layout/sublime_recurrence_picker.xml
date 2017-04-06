@@ -16,7 +16,7 @@
 
     <include layout="@layout/recurrence_options_menu" />
 
-    <com.zpw.zpwtimepickerlib.recurrencepicker.RecurrenceOptionCreator
+    <com.daliammao.zpwtimepickerlib.recurrencepicker.RecurrenceOptionCreator
         android:id="@+id/recurrenceOptionCreator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

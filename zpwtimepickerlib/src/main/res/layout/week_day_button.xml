@@ -12,7 +12,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.zpw.zpwtimepickerlib.recurrencepicker.WeekButton xmlns:android="http://schemas.android.com/apk/res/android"
+<com.daliammao.zpwtimepickerlib.recurrencepicker.WeekButton xmlns:android="http://schemas.android.com/apk/res/android"
     style="?attr/spRocWeekButtonStyle"
     android:layout_width="@dimen/week_button_size"
     android:layout_height="@dimen/week_button_size" />

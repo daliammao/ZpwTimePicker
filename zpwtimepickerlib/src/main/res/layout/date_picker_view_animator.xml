@@ -14,7 +14,7 @@
      limitations under the License.
 -->
 
-<com.zpw.zpwtimepickerlib.datepicker.PickerViewAnimator xmlns:android="http://schemas.android.com/apk/res/android"
+<com.daliammao.zpwtimepickerlib.datepicker.PickerViewAnimator xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/animator"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -26,17 +26,17 @@
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-        <com.zpw.zpwtimepickerlib.datepicker.DayPickerView
+        <com.daliammao.zpwtimepickerlib.datepicker.DayPickerView
             android:id="@+id/date_picker_day_picker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:tag="@string/sublime_date_picker_tag" />
     </ScrollView>
 
-    <com.zpw.zpwtimepickerlib.datepicker.YearPickerView
+    <com.daliammao.zpwtimepickerlib.datepicker.YearPickerView
         android:id="@+id/date_picker_year_picker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollIndicators="bottom" />
 
-</com.zpw.zpwtimepickerlib.datepicker.PickerViewAnimator>
+</com.daliammao.zpwtimepickerlib.datepicker.PickerViewAnimator>

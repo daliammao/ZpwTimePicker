@@ -160,7 +160,7 @@
                        is used for 'OK' action. Cross(X) drawable is
                        used for 'CANCEL' action.
              For 'icon' presentation mode, 'OK' & 'CANCEL' action
-             com.zpw.zpwtimepickerlib.drawables are assignable using 'okActionDrawable'
+             com.daliammao.zpwtimepickerlib.drawables are assignable using 'okActionDrawable'
              & 'cancelActionDrawable' (see below) -->
         <attr name="spPresentation" format="enum" >
             <enum name="spButton" value="0" />

@@ -21,7 +21,7 @@
 
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <com.zpw.zpwtimepickerlib.datepicker.DayPickerViewPager
+    <com.daliammao.zpwtimepickerlib.datepicker.DayPickerViewPager
         android:id="@+id/redp_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

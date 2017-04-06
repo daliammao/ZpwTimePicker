@@ -32,14 +32,14 @@
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
-        <com.zpw.zpwtimepickerlib.common.ButtonLayout
+        <com.daliammao.zpwtimepickerlib.common.ButtonLayout
             android:id="@+id/button_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
-    <com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker
+    <com.daliammao.zpwtimepickerlib.recurrencepicker.RecurrencePicker
         android:id="@+id/repeat_option_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

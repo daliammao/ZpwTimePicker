@@ -34,7 +34,7 @@
 
     </LinearLayout>
 
-    <com.zpw.zpwtimepickerlib.recurrencepicker.RecurrencePicker
+    <com.daliammao.zpwtimepickerlib.recurrencepicker.RecurrencePicker
         android:id="@+id/repeat_option_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

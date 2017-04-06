@@ -12,7 +12,7 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.zpw.zpwtimepickerlib.datetimepicker.DateTimePicker
+<com.daliammao.zpwtimepickerlib.datetimepicker.DateTimePicker
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/sublime_picker"
     android:layout_width="wrap_content"

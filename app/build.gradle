@@ -1,11 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
-        applicationId "com.zpw.zpwtimepicker"
+        applicationId "com.daliammao.zpwtimepicker"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
@@ -27,6 +27,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     releaseCompile project(path: ':zpwtimepickerlib', configuration: 'release')
     debugCompile project(path: ':zpwtimepickerlib', configuration: 'debug')
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:appcompat-v7:25+'
 }
