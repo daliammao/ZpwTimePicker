@@ -80,4 +80,4 @@ Results of the selection in **sample application** (date range):
 
 该项目参考自 [vikramkakkar/SublimePicker](https://github.com/vikramkakkar/SublimePicker)
 
-由于我比较偏爱jodatime处理时间，所以该项目的时间交互，我全部换成了jodatime，而且对于时间段选择，我去掉了原有拖动进入时间区域选择状态，而是根据初始化传入的值来判断是否进行区域选择。我还使项目支持了timepicker的区域选择。
+由于我比较偏爱jodatime处理时间，所以该项目的时间交互，我全部换成了jodatime，而且对于时间段选择，我去掉了原有拖动进入时间区域选择状态，而是根据初始化传入的值来判断是否进行区域选择。我还使项目支持了timepicker的区域选择，修复了横屏展示不全的bug。
